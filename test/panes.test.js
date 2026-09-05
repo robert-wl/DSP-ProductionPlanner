@@ -72,10 +72,7 @@ test('asking for no panes at all runs the calculation and posts no results', fun
 });
 
 test('a pane asked for later matches the one a full run posts', async function(t){
-    // The graph is left out here: the production tree tags merger and splitter
-    // nodes as it walks them, and those nodes go out with the graph, so the two
-    // are only equal when the tree ran first. Pinned separately below.
-    const LATE = ['tree', 'items', 'buildings'];
+    const LATE = ['tree', 'items', 'buildings', 'graph'];
 
     for(const scenario of scenarios)
     {
@@ -115,39 +112,29 @@ test('the graph asked for after the tree matches a full run', async function(t){
     }
 });
 
-test('the graph asked for before the tree is missing the tree walk\'s tag', function(){
+test('the graph says the same thing whichever pane ran first', function(){
     // Upstream tagged merger and splitter nodes with a buildingType while
-    // building the production tree, and those same node objects are what the
-    // graph message carries. Nothing reads the field off the graph - the
-    // stylesheet in components/ProductionGraph.jsx goes by nodeType - but the
-    // dependency is real, so it is pinned rather than left to be discovered.
+    // walking the production tree, and those same node objects are what the
+    // graph message carries - so the graph came out different depending on
+    // which pane had been asked for. Nothing read the field, and the build
+    // order does not walk the graph that way, so the coupling is gone. Pinned
+    // rather than left to be reintroduced.
     const graphFirst = run(FORM, ['graph']);
-    const whole      = run(FORM, undefined);
+    const treeFirst  = run(FORM, ['tree']);
+        requestPanes(treeFirst, ['graph']);
 
-    function countTagged(worker)
+    assert.deepStrictEqual(
+        payloadsOf(graphFirst, 'updateGraphNetwork'),
+        payloadsOf(treeFirst, 'updateGraphNetwork')
+    );
+
+    for(const node of payloadsOf(graphFirst, 'updateGraphNetwork')[0].nodes)
     {
-        let tagged   = 0;
-        let untagged = 0;
-
-        for(const node of payloadsOf(worker, 'updateGraphNetwork')[0].nodes)
+        if(node.data.nodeType === 'merger' || node.data.nodeType === 'splitter')
         {
-            if(node.data.nodeType !== 'merger' && node.data.nodeType !== 'splitter')
-            {
-                continue;
-            }
-
-            if(node.data.buildingType === undefined) { untagged++; } else { tagged++; }
+            assert.strictEqual(node.data.buildingType, undefined, 'belt plumbing should not carry a buildingType');
         }
-
-        return {tagged, untagged};
     }
-
-    const before = countTagged(graphFirst);
-    const after  = countTagged(whole);
-
-    assert.ok(after.tagged > 0, 'the scenario should have mergers or splitters to tag');
-    assert.strictEqual(before.tagged, 0, 'nothing should be tagged when the tree never ran');
-    assert.strictEqual(before.untagged, after.tagged, 'the same nodes, just untagged');
 });
 
 test('asking for a pane twice posts the same thing twice', function(){

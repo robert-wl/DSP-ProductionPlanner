@@ -14,6 +14,7 @@ export default function ProductionGraph({nodes, edges, direction, onLayoutDone})
     let layoutRef       = useRef(null);
     let pendingRef      = useRef(null);
     let layoutDoneRef   = useRef(onLayoutDone);
+    let hadSizeRef      = useRef(false);
 
     layoutDoneRef.current = onLayoutDone;
 
@@ -128,8 +129,42 @@ export default function ProductionGraph({nodes, edges, direction, onLayoutDone})
 
         createGraph();
 
+        /**
+         * The layout tab is not the one the page opens on, so this container
+         * starts out hidden and measuring nothing. cytoscape reads its size to
+         * work out the zoom, and a fit against an empty box leaves the graph
+         * blown up around a single node the first time you switch to it. The
+         * fit is redone once there is something to fit to.
+         *
+         * Only on the first sizing: later ones are the window being resized,
+         * where throwing away the pan you had chosen would be its own bug.
+         */
+        let observer = new ResizeObserver(function(entries){
+            let box = entries[0].contentRect;
+
+                if(box.width === 0 || box.height === 0 || graphRef.current === null)
+                {
+                    return;
+                }
+
+                graphRef.current.resize();
+
+                if(hadSizeRef.current === false)
+                {
+                    hadSizeRef.current = true;
+
+                    if(graphRef.current.elements().length > 0)
+                    {
+                        graphRef.current.fit();
+                    }
+                }
+        });
+
+        observer.observe(containerRef.current);
+
         return function(){
             cancelled = true;
+            observer.disconnect();
 
             if(layoutRef.current !== null)
             {
@@ -170,6 +205,9 @@ export default function ProductionGraph({nodes, edges, direction, onLayoutDone})
 
                 return;
             }
+
+            // Picks up a container that was hidden when cytoscape was created
+            graph.resize();
 
             layoutRef.current = graph.layout({
                 name                        : 'elk',

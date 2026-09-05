@@ -118,7 +118,8 @@ npm run build-data   # regenerate public/data and public/icons
 | `src/main.jsx` | Entry point, and the whole router: `/` and `/json/<payload>`. |
 | `lib/plannerWorker.js` | Starts that worker, relays its messages, and asks it for a result the page did not need up front. |
 | `lib/plannerState.js` | The planner's inputs, and their two shapes: the `formData` the worker expects, and the `/json/<payload>` share URL. |
-| `lib/resultHtml.mjs` | The markup for the production tree, items and buildings panes, built from what the worker posts. |
+| `lib/resultHtml.mjs` | The markup for the items and buildings panes, built from what the worker posts. |
+| `components/BuildOrder.jsx` | The build order: the plan as staged rows of machines to place, read forwards from the ore. |
 | `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's templates. |
 | `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet the upstream page used. |
 | `scripts/buildGameData.mjs` | The FactorioLab → worker schema adapter, and the sprite slicer. |
@@ -129,8 +130,8 @@ the original planner open here unchanged.
 
 ### The worker only builds the tab you are looking at
 
-There are four results — the layout, the production tree, the items list and
-the buildings list — and every run used to build all four before it said it was
+There are four results — the build order, the layout, the items list and the
+buildings list — and every run used to build all four before it said it was
 done. Three of them were work nobody had asked to see, and on a large plan that
 is most of the run: for 6000 Assembling Machine Mk.II a minute the calculation
 is ~320 ms and the results on top of it are the rest.
@@ -144,7 +145,7 @@ The worker is terminated when the next calculation starts.
 | --- | ---: | ---: |
 | all four, as it used to | 452 ms | 19.40 MB |
 | Layout | 350 ms | 12.45 MB |
-| Production tree | 396 ms | 6.63 MB |
+| Build order | 396 ms | 6.63 MB |
 | Items | 334 ms | 9 KB |
 | Buildings | 330 ms | 9 KB |
 

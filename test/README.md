@@ -22,12 +22,19 @@ context global, which is what a real WebWorker scope gives it. The worker keeps
 all of its state on `self`, and `generateTreeList` reads `requestedItems` as a
 bare global, so that detail matters.
 
+The production tree pane is left out of the differential on purpose. It is
+`components/BuildOrder.jsx` now — the plan read forwards from the ore and
+grouped into stages, rather than the reference's backwards nesting — so there
+is no upstream markup for it to match. `test/buildOrder.test.js` pins it
+instead, on the promise it actually makes: that the stages can be built in the
+order given without ever reaching for something that does not exist yet.
+
 `test/panes.test.js` covers the part the differential cannot: it always asks
 for every result, so it never exercises a run that builds one. These check that
 a result built on demand is identical to the one a full run posts, that a run
-builds nothing it was not asked for, and that the graph carries a merger and
-splitter tag only when the production tree ran first — a real dependency
-between two of the panes, pinned rather than left to be discovered.
+builds nothing it was not asked for, and that the graph comes out the same
+whichever pane ran first — it used to depend on the order, because the tree
+walk tagged merger and splitter nodes the graph then carried.
 
 `test/units.test.js` covers the individual lookups and helpers that were
 replaced, including the ones whose contract is easy to get subtly wrong:
@@ -37,7 +44,7 @@ exactly the value the original decrement loop reached.
 ## Running them
 
 ```
-npm test              # differential + pane + unit tests
+npm test              # differential + pane + build-order + unit tests
 npm run benchmark     # times the current worker against the reference
 ```
 

@@ -1,9 +1,10 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import BuildOrder from './BuildOrder.jsx';
 import ItemPicker from './ItemPicker.jsx';
 import ProductionGraph from './ProductionGraph.jsx';
 import {requestPanes, startPlannerWorker} from '../lib/plannerWorker.js';
-import {renderBuildingsList, renderItemsList, renderTreeList} from '../lib/resultHtml.mjs';
+import {renderBuildingsList, renderItemsList} from '../lib/resultHtml.mjs';
 import {
     ASSEMBLER_SPEEDS,
     DEFAULT_STATE,
@@ -16,9 +17,12 @@ import {
     stateFromPayload
 } from '../lib/plannerState.js';
 
+// The build order leads: it is the one that answers "what do I place first",
+// which is the question you have before the factory exists. The layout is what
+// you check once it does.
 const TABS = [
+    {id: 'tree',        label: 'Build order'},
     {id: 'graph',       label: 'Layout'},
-    {id: 'tree',        label: 'Production tree'},
     {id: 'items',       label: 'Items'},
     {id: 'buildings',   label: 'Buildings'}
 ];
@@ -50,14 +54,13 @@ export default function Planner({initialPayload})
     let [buildingsData, setBuildings]   = useState(null);
     let [graph, setGraph]               = useState({nodes: null, edges: [], direction: 'RIGHT'});
 
-    let [tab, setTab]                   = useState('graph');
+    let [tab, setTab]                   = useState('tree');
     let [picker, setPicker]             = useState(null);
     let [showAltRecipes, setShowAlts]   = useState(false);
     let [copied, setCopied]             = useState(false);
 
     let workerRef       = useRef(null);
     let isFirstRunRef   = useRef(true);
-    let treeRef         = useRef(null);
 
     // Which of the four results the current worker has been asked for, and
     // which tab wants one. A run only builds the tab you are looking at; the
@@ -258,12 +261,8 @@ export default function Planner({initialPayload})
         requestPanes(workerRef.current, [tab]);
     }, [tab, busy]);
 
-    // The markup for the three list panes. The worker posts the data and this
-    // is where it becomes HTML.
-    let treeHtml = useMemo(function(){
-        return treeData === null ? '' : renderTreeList(treeData);
-    }, [treeData]);
-
+    // The markup for the two list panes. The worker posts the data and this is
+    // where it becomes HTML.
     let itemsHtml = useMemo(function(){
         return itemsData === null ? '' : renderItemsList(itemsData);
     }, [itemsData]);
@@ -294,38 +293,6 @@ export default function Planner({initialPayload})
 
         return function(){ document.removeEventListener('error', onError, true); };
     }, []);
-
-    // The tree's building rows collapse their sub-tree on click, which the
-    // upstream page wired up with jQuery after every render.
-    useEffect(function(){
-        let container = treeRef.current;
-
-            if(container === null)
-            {
-                return;
-            }
-
-            function onClick(event)
-            {
-                let toggle = event.target.closest('.collapseChildren');
-
-                    if(toggle === null || container.contains(toggle) === false)
-                    {
-                        return;
-                    }
-
-                let subTree = toggle.parentElement === null ? null : toggle.parentElement.nextElementSibling;
-
-                    if(subTree !== null && subTree.classList.contains('parent') === true)
-                    {
-                        subTree.hidden = subTree.hidden === false;
-                    }
-            }
-
-            container.addEventListener('click', onClick);
-
-            return function(){ container.removeEventListener('click', onClick); };
-    }, [treeHtml]);
 
     // State helpers ---------------------------------------------------------
     function updateOption(key, value)
@@ -713,6 +680,10 @@ export default function Planner({initialPayload})
                             </div>
                         )}
 
+                        <div className="tabPane scrollPane" hidden={tab !== 'tree'}>
+                            <BuildOrder data={treeData} />
+                        </div>
+
                         <div className="tabPane" hidden={tab !== 'graph'}>
                             <ProductionGraph
                                 nodes={graph.nodes}
@@ -723,10 +694,6 @@ export default function Planner({initialPayload})
                                     setBusy(false);
                                 }}
                             />
-                        </div>
-
-                        <div className="tabPane scrollPane" hidden={tab !== 'tree'}>
-                            <div ref={treeRef} className="workerHtml" dangerouslySetInnerHTML={{__html: treeHtml}} />
                         </div>
 
                         <div className="tabPane scrollPane" hidden={tab !== 'items'}>
