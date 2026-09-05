@@ -401,14 +401,27 @@ export default function ProductionPlannerWorker()
                         continue;
                     }
 
-                    let nodeRecipe = self.graphNodes[i].data.recipe;
-                        if(nodesByRecipe[nodeRecipe] === undefined)
+                    let nodeData = self.graphNodes[i].data;
+                    let bucket   = nodesByRecipe[nodeData.recipe];
+
+                        if(bucket === undefined)
                         {
-                            nodesByRecipe[nodeRecipe] = [];
+                            // minQtyUsed is the cheapest candidate the bucket will ever
+                            // offer: merging only ever raises a survivor's qtyUsed, and a
+                            // node that leaves the bucket cannot lower the minimum.
+                            bucket = {entries: [], minQtyUsed: Infinity};
+                            nodesByRecipe[nodeData.recipe] = bucket;
                         }
 
-                        // Filled descending, to keep the original iteration order
-                        nodesByRecipe[nodeRecipe].push(i);
+                        // Filled descending, to keep the original iteration order.
+                        // Holding the node data next to the index keeps the scan below off
+                        // self.graphNodes, which `delete` has turned into a sparse array.
+                        bucket.entries.push({index: i, data: nodeData});
+
+                        if(nodeData.qtyUsed < bucket.minQtyUsed)
+                        {
+                            bucket.minQtyUsed = nodeData.qtyUsed;
+                        }
                 }
 
                 for(let k = 0; k < self.graphEdges.length; k++)
@@ -433,6 +446,9 @@ export default function ProductionPlannerWorker()
                         edgesByTarget[edgeData.target].push(self.graphEdges[k]);
                 }
 
+                let maxBeltSpeed    = self.options.maxBeltSpeed;
+                let isSimpleView    = (self.options.viewMode === 'SIMPLE');
+
                 for(let i = self.graphNodes.length - 1; i >= 0 ; i--)
                 {
                     if(self.graphNodes[i] === undefined || self.graphNodes[i].data.nodeType !== 'productionBuilding')
@@ -441,90 +457,96 @@ export default function ProductionPlannerWorker()
                     }
 
                     let mergingNodeData = self.graphNodes[i].data;
-                    let sameRecipeNodes = nodesByRecipe[mergingNodeData.recipe];
 
-                    for(let n = 0; n < sameRecipeNodes.length; n++)
+                    // A saturated building cannot take anything else in, and qtyUsed
+                    // only ever grows, so its whole bucket scan would be a no-op.
+                    if(isSimpleView === false && mergingNodeData.qtyUsed >= mergingNodeData.qtyProduced)
                     {
-                        let j = sameRecipeNodes[n];
+                        continue;
+                    }
 
-                        if(i !== j && self.graphNodes[j] !== undefined) // Not yet tested...
-                        {
-                            let sourceNodeData  = self.graphNodes[j].data;
+                    let bucket              = nodesByRecipe[mergingNodeData.recipe];
+                    let mergingQtyUsed      = mergingNodeData.qtyUsed;
+                    let mergingQtyProduced  = mergingNodeData.qtyProduced;
+                    let mergingNodeId       = mergingNodeData.id;
 
-                            if(mergingNodeData.id !== sourceNodeData.id)
+                    // What a full merge is allowed to reach: Math.min(maxMergedQty,
+                    // qtyProduced, maxBeltSpeed) falls short of maxMergedQty exactly
+                    // when maxMergedQty passes this, so one comparison decides a
+                    // candidate. A partial merge is dead code below, and the
+                    // percentage it would compute cannot round back up to 100 for
+                    // non-negative quantities, so nothing else has to be worked out.
+                    let maxMergeable        = Math.min(mergingQtyProduced, maxBeltSpeed);
+
+                    // Even the cheapest node in the bucket overflows this one, so the
+                    // whole scan below could only fail. Written as an addition, like the
+                    // per-candidate test, so the two round identically.
+                    if(isSimpleView === false && (mergingQtyUsed + bucket.minQtyUsed) > maxMergeable)
+                    {
+                        continue;
+                    }
+
+                    let sameRecipeNodes = bucket.entries;
+                    let liveNodes       = 0;    // Write cursor, compacting the bucket in place
+                    let n               = 0;
+
+                    for(; n < sameRecipeNodes.length; n++)
+                    {
+                        let candidate = sameRecipeNodes[n];
+
+                            if(liveNodes !== n)
                             {
-                                if(mergingNodeData.qtyUsed < mergingNodeData.qtyProduced || self.options.viewMode === 'SIMPLE')
+                                sameRecipeNodes[liveNodes] = candidate;
+                            }
+                            liveNodes++;
+
+                        if(candidate.index !== i) // Not yet tested...
+                        {
+                            let sourceNodeData  = candidate.data;
+
+                            if(mergingNodeId !== sourceNodeData.id)
+                            {
+                                if(isSimpleView === false && mergingQtyUsed >= mergingQtyProduced)
                                 {
-                                    let maxMergedQty        = mergingNodeData.qtyUsed + sourceNodeData.qtyUsed;
-                                    let mergedPercentage    = 100;
-                                    let maxBeltSpeed        = self.options.maxBeltSpeed;
-                                    let mergedQty           = Math.min(maxMergedQty, mergingNodeData.qtyProduced, maxBeltSpeed);
-                                        if(self.options.viewMode === 'SIMPLE')
-                                        {
-                                            mergedQty   = maxMergedQty;
-                                        }
-                                        if(mergedQty < maxMergedQty)
-                                        {
-                                            mergedPercentage = (mergedQty - mergingNodeData.qtyUsed) / (maxMergedQty - mergingNodeData.qtyUsed) * 100;
-                                        }
+                                    n++;    // Kept above, so the tail copy must not repeat it
+                                    break;  // Filled up by the merges above - nothing left to take
+                                }
 
-                                    if((mergedQty <= mergingNodeData.qtyProduced && mergedQty <= maxBeltSpeed) || self.options.viewMode === 'SIMPLE')
-                                    {
-                                        // Tests if input/output are allowed to that new speed...
-                                        let canMergeInputs  = self.testEdgesMaxSpeeds(mergingNodeData, sourceNodeData, mergedPercentage, edgesByTarget);
-                                            if(canMergeInputs === true && mergedPercentage === 100)
-                                            {
-                                                // Update edges! Only the ones touching the node we drop.
-                                                self.moveIndexedEdges(edgesBySource, sourceNodeData.id, mergingNodeData.id, 'source');
-                                                self.moveIndexedEdges(edgesByTarget, sourceNodeData.id, mergingNodeData.id, 'target');
+                                let mergedQty = mergingQtyUsed + sourceNodeData.qtyUsed;
 
-                                                delete self.graphNodes[j];
+                                if(isSimpleView === false && mergedQty > maxMergeable)
+                                {
+                                    continue;
+                                }
 
-                                                mergingNodeData.qtyUsed     = mergedQty;
-                                            }
-                                        /**/
-                                        if(1 === 2 && canMergeInputs === true && mergedPercentage < 100 && pass === 2)
-                                        {
-                                            mergingNodeData.qtyUsed  = mergedQty;
-                                            sourceNodeData.qtyUsed  -= sourceNodeData.qtyUsed * (mergedPercentage / 100);
+                                // Tests if input/output are allowed to that new speed...
+                                if(self.testEdgesMaxSpeeds(mergingNodeData, sourceNodeData, 100, edgesByTarget) === true)
+                                {
+                                    // Update edges! Only the ones touching the node we drop.
+                                    self.moveIndexedEdges(edgesBySource, sourceNodeData.id, mergingNodeId, 'source');
+                                    self.moveIndexedEdges(edgesByTarget, sourceNodeData.id, mergingNodeId, 'target');
 
-                                            if(sourceNodeData.qtyUsed === 0)
-                                            {
-                                                delete self.graphNodes[j];
-                                            }
-                                            else
-                                            {
-                                                for(let k = 0; k < self.graphEdges.length; k++)
-                                                {
-                                                    if(self.graphEdges[k] !== undefined)
-                                                    {
-                                                        if(self.graphEdges[k].data.source === sourceNodeData.id || self.graphEdges[k].data.target === sourceNodeData.id)
-                                                        {
-                                                            let removedQty = self.graphEdges[k].data.qty * (mergedPercentage / 100);
-                                                                self.graphEdges[k].data.qty -= removedQty;
+                                    delete self.graphNodes[candidate.index];
+                                    liveNodes--;    // Dropped here, so no later scan sees it
 
-                                                            for(let m = 0; m < self.graphEdges.length; m++)
-                                                            {
-                                                                if(self.graphEdges[m] !== undefined)
-                                                                {
-                                                                    if(m !== k && (self.graphEdges[m].data.source === mergingNodeData.id || self.graphEdges[m].data.target === mergingNodeData.id) && self.graphEdges[k].data.itemId === self.graphEdges[m].data.itemId)
-                                                                    {
-                                                                        self.graphEdges[m].data.qty += removedQty;
-                                                                        break;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        /**/
-                                    }
+                                    mergingQtyUsed              = mergedQty;
+                                    mergingNodeData.qtyUsed     = mergedQty;
                                 }
                             }
                         }
                     }
+
+                    // Whatever the break above skipped, which is still in the bucket
+                    for(; n < sameRecipeNodes.length; n++)
+                    {
+                        if(liveNodes !== n)
+                        {
+                            sameRecipeNodes[liveNodes] = sameRecipeNodes[n];
+                        }
+                        liveNodes++;
+                    }
+
+                    sameRecipeNodes.length = liveNodes;
                 }
 
                 // Update previous merged edges...
