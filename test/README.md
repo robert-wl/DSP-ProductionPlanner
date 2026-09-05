@@ -1,0 +1,47 @@
+# Tests
+
+The planner's calculation was optimized for speed, not changed in behaviour.
+These tests exist to keep it that way.
+
+## How it works
+
+`test/fixtures/referenceWorker.js` is a verbatim copy of `src/Worker.js` as it
+stood at commit `6afbc50`, before the optimization. `test/differential.test.js`
+runs it and the current `src/Worker.js` side by side over the same scenarios
+and requires them to post byte-identical results — node ids, edge quantities,
+generated HTML, required power, everything.
+
+`test/runWorker.js` loads either worker into a `vm` context whose `self` is the
+context global, which is what a real WebWorker scope gives it. The worker keeps
+all of its state on `self`, and `generateTreeList` reads `requestedItems` as a
+bare global, so that detail matters.
+
+`test/units.test.js` covers the individual lookups and helpers that were
+replaced, including the ones whose contract is easy to get subtly wrong:
+"first match wins" in the class-name index, and the belt-speed clamp landing on
+exactly the value the original decrement loop reached.
+
+## Running them
+
+```
+npm test              # differential + unit tests
+npm run benchmark     # times the current worker against the reference
+```
+
+The suite takes a while, most of it spent in the reference implementation.
+That is the point.
+
+## Changing the planner's output
+
+If a change to `src/Worker.js` is *meant* to change what the planner produces,
+the differential tests will fail by design. Update
+`test/fixtures/referenceWorker.js` to the new intended behaviour in the same
+commit, and say so in the commit message.
+
+## Fixtures
+
+`test/fixtures/gameData.js` is a synthetic, DSP-shaped dataset rather than a
+dump of the real game data: it is small enough to reason about while still
+covering ore extraction, smelting, assembling at three tiers, multi-output
+refining (by-products), alternative recipes, and a deliberately belt-hungry
+recipe that forces the throughput clamp to engage.

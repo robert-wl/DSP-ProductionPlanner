@@ -11,7 +11,9 @@
         "webpack-cli": "^4.2.0"
     },
     "scripts": {
-        "build-SCIM": "webpack"
+        "build-SCIM": "webpack",
+        "test": "node --test \"test/*.test.js\"",
+        "benchmark": "node test/benchmark.js"
     },
     "main": "webpack.config.js",
     "keywords": [],
