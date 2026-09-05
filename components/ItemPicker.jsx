@@ -1,9 +1,36 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 
 /**
+ * Headings for the category each item carries.
+ *
+ * The categories themselves are the ones src/Worker.js reasons about - `ore`
+ * and `liquid` change how it plans - so they are named for it, not for a
+ * reader. Anything unlisted falls back to its own name.
+ */
+const CATEGORY_LABELS = {
+    'ore'                   : 'Ores',
+    'liquid'                : 'Liquids',
+    'material'              : 'Materials',
+    'component'             : 'Components',
+    'fuel'                  : 'Fuels',
+    'science-matrix'        : 'Science matrices',
+    'dark-fog'              : 'Dark Fog',
+    'special'               : 'Special',
+
+    'extraction'            : 'Extraction',
+    'production'            : 'Production',
+    'generator'             : 'Power generation',
+    'powerTransmission'     : 'Power transmission',
+    'storage'               : 'Storage',
+    'logistic'              : 'Logistics',
+    'planetaryLogistic'     : 'Planetary logistics',
+    'interstellarLogistic'  : 'Interstellar logistics'
+};
+
+/**
  * The "add an item" dialog. The upstream page server-rendered one modal per
- * list; here both lists share this component and are built from whatever the
- * game-data API returned.
+ * list; here both lists share this component, over the items and the
+ * buildings both - the worker plans a building like anything else.
  */
 export default function ItemPicker({title, items, excluded, onPick, onClose})
 {
@@ -59,13 +86,14 @@ export default function ItemPicker({title, items, excluded, onPick, onClose})
         }
 
         return Array.from(byGroup.entries())
-                    .sort(function(a, b){ return a[0].localeCompare(b[0]); })
                     .map(function(entry){
                         return {
                             category    : entry[0],
+                            label       : CATEGORY_LABELS[entry[0]] || entry[0],
                             items       : entry[1].sort(function(a, b){ return a.name.localeCompare(b.name); })
                         };
-                    });
+                    })
+                    .sort(function(a, b){ return a.label.localeCompare(b.label); });
     }, [items, excluded, search]);
 
     let total = groups.reduce(function(count, group){ return count + group.items.length; }, 0);
@@ -98,7 +126,7 @@ export default function ItemPicker({title, items, excluded, onPick, onClose})
                     {groups.map(function(group){
                         return (
                             <section key={group.category}>
-                                <h3 className="pickerCategory">{group.category}</h3>
+                                <h3 className="pickerCategory">{group.label}</h3>
                                 <ul className="pickerGrid">
                                     {group.items.map(function(item){
                                         return (
