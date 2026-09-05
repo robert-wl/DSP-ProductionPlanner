@@ -36,6 +36,14 @@ builds nothing it was not asked for, and that the graph comes out the same
 whichever pane ran first — it used to depend on the order, because the tree
 walk tagged merger and splitter nodes the graph then carried.
 
+`test/recipeChoice.test.js` covers the sidebar's per-item recipe choice, which
+is a client-side reading of the worker's `altRecipes` list: that the recipe
+`lib/plannerState.js` shows as the automatic one is the recipe the worker picks,
+and that a choice per item survives being flattened into the one list the worker
+takes - including when a by-product recipe would otherwise answer for an item
+that chose something else. It runs over the synthetic fixture and the real
+`public/data/game.json`, where those cases actually occur.
+
 `test/units.test.js` covers the individual lookups and helpers that were
 replaced, including the ones whose contract is easy to get subtly wrong:
 "first match wins" in the class-name index, and the belt-speed clamp landing on

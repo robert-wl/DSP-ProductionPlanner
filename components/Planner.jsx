@@ -10,8 +10,11 @@ import {
     DEFAULT_STATE,
     DIRECTIONS,
     SMELTER_SPEEDS,
+    altRecipesFrom,
     buildFormData,
     pickableItems,
+    recipeChoicesFor,
+    recipeChoicesFrom,
     recipesForState,
     shareUrlFor,
     stateFromPayload
@@ -56,7 +59,7 @@ export default function Planner({initialPayload})
 
     let [tab, setTab]                   = useState('tree');
     let [picker, setPicker]             = useState(null);
-    let [showAltRecipes, setShowAlts]   = useState(false);
+    let [showRecipes, setShowRecipes]   = useState(false);
     let [copied, setCopied]             = useState(false);
 
     let workerRef       = useRef(null);
@@ -325,14 +328,22 @@ export default function Planner({initialPayload})
         setQuantity(list, itemId, '60');
     }
 
-    function toggleAltRecipe(recipeId)
+    // An empty recipeId hands the item back to the planner's own pick.
+    function setRecipeChoice(itemId, recipeId)
     {
         setState(function(previous){
-            let selected = previous.altRecipes.includes(recipeId)
-                         ? previous.altRecipes.filter(function(id){ return id !== recipeId; })
-                         : previous.altRecipes.concat([recipeId]);
+            let choices = {...recipeChoicesFrom(previous.altRecipes, gameData)};
 
-            return {...previous, altRecipes: selected};
+                if(recipeId === '')
+                {
+                    delete choices[itemId];
+                }
+                else
+                {
+                    choices[itemId] = recipeId;
+                }
+
+            return {...previous, altRecipes: altRecipesFrom(choices, gameData.recipesData)};
         });
     }
 
@@ -360,44 +371,17 @@ export default function Planner({initialPayload})
     // Derived ---------------------------------------------------------------
     let items = useMemo(function(){ return pickableItems(gameData); }, [gameData]);
 
-    let altRecipes = useMemo(function(){
-        if(gameData === null)
-        {
-            return [];
-        }
-
-        let recipes = [];
-
-        for(let recipeId in gameData.recipesData)
-        {
-            // How src/Worker.js itself decides a recipe is an alternative.
-            if(recipeId.indexOf('_Alternative') === -1)
-            {
-                continue;
-            }
-
-            let recipe   = gameData.recipesData[recipeId];
-            let produced = Object.keys(recipe.produce || {}).map(function(className){
-                for(let itemId in gameData.itemsData)
-                {
-                    if(gameData.itemsData[itemId].className === className)
-                    {
-                        return gameData.itemsData[itemId].name;
-                    }
-                }
-
-                return className;
-            });
-
-            recipes.push({
-                id      : recipeId,
-                name    : recipe.name || recipeId,
-                produces: produced.join(', ')
-            });
-        }
-
-        return recipes.sort(function(a, b){ return a.name.localeCompare(b.name); });
+    // Only items more than one recipe makes: everywhere else there is nothing
+    // to choose between.
+    let recipeChoices = useMemo(function(){
+        return recipeChoicesFor(gameData);
     }, [gameData]);
+
+    let chosenRecipes = useMemo(function(){
+        return recipeChoicesFrom(state.altRecipes, gameData);
+    }, [state.altRecipes, gameData]);
+
+    let chosenCount = Object.keys(chosenRecipes).length;
 
     let beltOptions = useMemo(function(){
         if(gameData === null)
@@ -620,35 +604,55 @@ export default function Planner({initialPayload})
                         )}
                     </section>
 
-                    {altRecipes.length > 0 && (
+                    {recipeChoices.length > 0 && (
                         <section className="panel">
                             <div className="panelHead">
-                                <h2>Alternative recipes</h2>
-                                <button type="button" className="button small ghost" onClick={function(){ setShowAlts(showAltRecipes === false); }}>
-                                    {showAltRecipes === true ? 'Hide' : (state.altRecipes.length > 0 ? state.altRecipes.length + ' selected' : 'Show')}
+                                <h2>Recipes</h2>
+                                <button type="button" className="button small ghost" onClick={function(){ setShowRecipes(showRecipes === false); }}>
+                                    {showRecipes === true ? 'Hide' : (chosenCount > 0 ? chosenCount + ' chosen' : 'Show')}
                                 </button>
                             </div>
 
-                            {showAltRecipes === true && (
-                                <ul className="checkList">
-                                    {altRecipes.map(function(recipe){
-                                        return (
-                                            <li key={recipe.id}>
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={state.altRecipes.includes(recipe.id)}
-                                                        onChange={function(){ toggleAltRecipe(recipe.id); }}
-                                                    />
-                                                    <span>
-                                                        {recipe.name}
-                                                        {recipe.produces !== '' && <small className="muted"> &rarr; {recipe.produces}</small>}
-                                                    </span>
-                                                </label>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                            {showRecipes === true && (
+                                <>
+                                    <p className="muted panelHint">Items more than one recipe makes. Left on auto, the planner picks the one shown.</p>
+
+                                    <ul className="recipeList">
+                                        {recipeChoices.map(function(choice){
+                                            let selected = chosenRecipes[choice.itemId];
+                                            let active   = choice.recipes.find(function(recipe){
+                                                return recipe.id === (selected === undefined ? choice.auto : selected);
+                                            });
+
+                                            return (
+                                                <li key={choice.itemId} className="recipeRow">
+                                                    {choice.image
+                                                        ? <img src={choice.image} alt="" />
+                                                        : <span className="quantityRowIcon" aria-hidden="true" />}
+
+                                                    <div className="recipeRowBody">
+                                                        <span className="quantityRowName">{choice.name}</span>
+
+                                                        <select
+                                                            value={selected === undefined ? '' : selected}
+                                                            aria-label={'Recipe for ' + choice.name}
+                                                            onChange={function(event){ setRecipeChoice(choice.itemId, event.target.value); }}
+                                                        >
+                                                            <option value="">
+                                                                {'Auto' + (autoName(choice) === null ? '' : ' \u2014 ' + autoName(choice))}
+                                                            </option>
+                                                            {choice.recipes.map(function(recipe){
+                                                                return <option key={recipe.id} value={recipe.id}>{recipe.name}</option>;
+                                                            })}
+                                                        </select>
+
+                                                        {active !== undefined && <span className="muted recipeRowDetail">{active.detail}</span>}
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </>
                             )}
                         </section>
                     )}
@@ -718,6 +722,13 @@ export default function Planner({initialPayload})
             )}
         </main>
     );
+}
+
+function autoName(choice)
+{
+    let auto = choice.recipes.find(function(recipe){ return recipe.id === choice.auto; });
+
+    return auto === undefined ? null : auto.name;
 }
 
 function QuantityRow({item, itemId, value, onChange, onRemove})
