@@ -1,5 +1,3 @@
-'use client';
-
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import ItemPicker from './ItemPicker.jsx';
@@ -59,7 +57,7 @@ export default function Planner({initialPayload})
     useEffect(function(){
         let cancelled = false;
 
-        fetch('/api/game')
+        fetch('/data/game.json')
             .then(function(response){
                 if(response.ok === false)
                 {
@@ -199,10 +197,10 @@ export default function Planner({initialPayload})
         };
     }, []);
 
-    // Item art is loaded from the upstream site (ASSET_BASE_URL). If a URL does
-    // not resolve, swap in the placeholder rather than leaving a broken-image
-    // glyph. Images arrive inside worker-generated HTML, so this listens on the
-    // capture phase - "error" does not bubble.
+    // Item art is sliced out of the FactorioLab sprite into public/icons at
+    // build time. If one is missing, swap in the placeholder rather than
+    // leaving a broken-image glyph. Images arrive inside worker-generated
+    // HTML, so this listens on the capture phase - "error" does not bubble.
     useEffect(function(){
         function onError(event)
         {
@@ -214,7 +212,7 @@ export default function Planner({initialPayload})
                 }
 
                 image.dataset.fallbackApplied = 'true';
-                image.src = '/api/icon';
+                image.src = '/placeholder.svg';
         }
 
         document.addEventListener('error', onError, true);

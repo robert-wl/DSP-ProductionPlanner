@@ -1,0 +1,4950 @@
+{
+    "branch": "Stable",
+    "language": "en",
+    "gameVersion": "0.10.29.21950",
+    "source": "FactorioLab (vendor/factoriolab, see SOURCE.md)",
+    "buildingsData": {
+        "Tesla_Tower": {
+            "className": "Tesla_Tower",
+            "name": "Tesla Tower",
+            "category": "powerTransmission",
+            "image": "/icons/tesla-tower.webp",
+            "url": "https://dsp-wiki.com/Tesla_Tower",
+            "stack": 100,
+            "color": "#b39292"
+        },
+        "Wireless_Power_Tower": {
+            "className": "Wireless_Power_Tower",
+            "name": "Wireless Power Tower",
+            "category": "powerTransmission",
+            "image": "/icons/wireless-power-tower.webp",
+            "url": "https://dsp-wiki.com/Wireless_Power_Tower",
+            "powerUsed": 4800,
+            "idlePower": 90,
+            "stack": 100,
+            "color": "#5a81b9"
+        },
+        "Satellite_Substation": {
+            "className": "Satellite_Substation",
+            "name": "Satellite Substation",
+            "category": "powerTransmission",
+            "image": "/icons/satellite-substation.webp",
+            "url": "https://dsp-wiki.com/Satellite_Substation",
+            "powerUsed": 0,
+            "idlePower": 720,
+            "stack": 30,
+            "color": "#9898af"
+        },
+        "Wind_Turbine": {
+            "className": "Wind_Turbine",
+            "name": "Wind Turbine",
+            "category": "generator",
+            "image": "/icons/wind-turbine.webp",
+            "url": "https://dsp-wiki.com/Wind_Turbine",
+            "powerUsed": -300,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#bc898e"
+        },
+        "Thermal_Power_Plant": {
+            "className": "Thermal_Power_Plant",
+            "name": "Thermal Power Plant",
+            "category": "generator",
+            "image": "/icons/thermal-power-plant.webp",
+            "url": "https://dsp-wiki.com/Thermal_Power_Plant",
+            "powerUsed": 0,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#b99d90"
+        },
+        "Solar_Panel": {
+            "className": "Solar_Panel",
+            "name": "Solar Panel",
+            "category": "generator",
+            "image": "/icons/solar-panel.webp",
+            "url": "https://dsp-wiki.com/Solar_Panel",
+            "powerUsed": -360,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#818b9d"
+        },
+        "Geothermal_Power_Station": {
+            "className": "Geothermal_Power_Station",
+            "name": "Geothermal Power Station",
+            "category": "generator",
+            "image": "/icons/geothermal-power-station.webp",
+            "url": "https://dsp-wiki.com/Geothermal_Power_Station",
+            "powerUsed": -4800,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#91868c"
+        },
+        "Mini_Fusion_Power_Plant": {
+            "className": "Mini_Fusion_Power_Plant",
+            "name": "Mini Fusion Power Plant",
+            "category": "generator",
+            "image": "/icons/mini-fusion-power-plant.webp",
+            "url": "https://dsp-wiki.com/Mini_Fusion_Power_Plant",
+            "powerUsed": 0,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#8a9bab"
+        },
+        "Energy_Exchanger": {
+            "className": "Energy_Exchanger",
+            "name": "Energy Exchanger",
+            "category": "powerTransmission",
+            "image": "/icons/energy-exchanger.webp",
+            "url": "https://dsp-wiki.com/Energy_Exchanger",
+            "powerUsed": 54000,
+            "productionSpeed": 1,
+            "stack": 20,
+            "color": "#7291af"
+        },
+        "Accumulator": {
+            "className": "Accumulator",
+            "name": "Accumulator",
+            "category": "storage",
+            "image": "/icons/accumulator.webp",
+            "url": "https://dsp-wiki.com/Accumulator",
+            "stack": 50,
+            "color": "#868e8f"
+        },
+        "Accumulator_Full": {
+            "className": "Accumulator_Full",
+            "name": "Accumulator (full)",
+            "category": "storage",
+            "image": "/icons/accumulator-full.webp",
+            "url": "https://dsp-wiki.com/Accumulator_(full)",
+            "stack": 50,
+            "color": "#969cba"
+        },
+        "Ray_Receiver": {
+            "className": "Ray_Receiver",
+            "name": "Ray Receiver",
+            "category": "generator",
+            "image": "/icons/ray-receiver.webp",
+            "url": "https://dsp-wiki.com/Ray_Receiver",
+            "powerUsed": 0,
+            "extractionRate": 6,
+            "stack": 20,
+            "color": "#728da8"
+        },
+        "Artificial_Star": {
+            "className": "Artificial_Star",
+            "name": "Artificial Star",
+            "category": "generator",
+            "image": "/icons/artificial-star.webp",
+            "url": "https://dsp-wiki.com/Artificial_Star",
+            "powerUsed": 0,
+            "productionSpeed": 1,
+            "stack": 20,
+            "color": "#b1a46c"
+        },
+        "ConveyorBeltMk1": {
+            "className": "ConveyorBeltMk1",
+            "name": "Conveyor Belt MK.I",
+            "category": "logistic",
+            "image": "/icons/conveyor-belt-1.webp",
+            "url": "https://dsp-wiki.com/Conveyor_Belt_MK.I",
+            "beltSpeed": 6,
+            "stack": 300,
+            "color": "#998f81"
+        },
+        "ConveyorBeltMk2": {
+            "className": "ConveyorBeltMk2",
+            "name": "Conveyor Belt MK.II",
+            "category": "logistic",
+            "image": "/icons/conveyor-belt-2.webp",
+            "url": "https://dsp-wiki.com/Conveyor_Belt_MK.II",
+            "beltSpeed": 12,
+            "stack": 300,
+            "color": "#7a8f8a"
+        },
+        "ConveyorBeltMk3": {
+            "className": "ConveyorBeltMk3",
+            "name": "Conveyor Belt MK.III",
+            "category": "logistic",
+            "image": "/icons/conveyor-belt-3.webp",
+            "url": "https://dsp-wiki.com/Conveyor_Belt_MK.III",
+            "beltSpeed": 30,
+            "stack": 300,
+            "color": "#7d8e98"
+        },
+        "Splitter": {
+            "className": "Splitter",
+            "name": "Splitter",
+            "category": "logistic",
+            "image": "/icons/splitter.webp",
+            "url": "https://dsp-wiki.com/Splitter",
+            "stack": 50,
+            "color": "#868e92"
+        },
+        "Automatic_Piler": {
+            "className": "Automatic_Piler",
+            "name": "Automatic Piler",
+            "category": "logistic",
+            "image": "/icons/automatic-piler.webp",
+            "url": "https://dsp-wiki.com/Automatic_Piler",
+            "powerUsed": 144,
+            "idlePower": 9,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#8e95a6"
+        },
+        "Traffic_Monitor": {
+            "className": "Traffic_Monitor",
+            "name": "Traffic Monitor",
+            "category": "logistic",
+            "image": "/icons/traffic-monitor.webp",
+            "url": "https://dsp-wiki.com/Traffic_Monitor",
+            "powerUsed": 36,
+            "idlePower": 9,
+            "stack": 100,
+            "color": "#87ab96"
+        },
+        "Spray_Coater": {
+            "className": "Spray_Coater",
+            "name": "Spray Coater",
+            "category": "production",
+            "image": "/icons/spray-coater.webp",
+            "url": "https://dsp-wiki.com/Spray_Coater",
+            "powerUsed": 90,
+            "idlePower": 4.5,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#9a9792"
+        },
+        "Storage_1": {
+            "className": "Storage_1",
+            "name": "Depot MK.I",
+            "category": "storage",
+            "image": "/icons/storage-1.webp",
+            "url": "https://dsp-wiki.com/Depot_MK.I",
+            "stack": 50,
+            "color": "#a5acb0"
+        },
+        "Storage_2": {
+            "className": "Storage_2",
+            "name": "Depot MK.II",
+            "category": "storage",
+            "image": "/icons/storage-2.webp",
+            "url": "https://dsp-wiki.com/Depot_MK.II",
+            "stack": 50,
+            "color": "#a9b1b5"
+        },
+        "Storage_Tank": {
+            "className": "Storage_Tank",
+            "name": "Storage Tank",
+            "category": "storage",
+            "image": "/icons/storage-tank.webp",
+            "url": "https://dsp-wiki.com/Storage_Tank",
+            "stack": 50,
+            "color": "#89979e"
+        },
+        "Logistics_Distributor": {
+            "className": "Logistics_Distributor",
+            "name": "Logistics Distributor",
+            "category": "logistic",
+            "image": "/icons/logistics-distributor.webp",
+            "url": "https://dsp-wiki.com/Logistics_Distributor",
+            "powerUsed": 9000,
+            "idlePower": 18,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#727684"
+        },
+        "Planetary_Logistics_Station": {
+            "className": "Planetary_Logistics_Station",
+            "name": "Planetary Logistics Station",
+            "category": "planetaryLogistic",
+            "image": "/icons/planetary-logistics-station.webp",
+            "url": "https://dsp-wiki.com/Planetary_Logistics_Station",
+            "powerUsed": 60000,
+            "idlePower": 60,
+            "productionSpeed": 1,
+            "stack": 10,
+            "color": "#767f87"
+        },
+        "Interstellar_Logistics_Station": {
+            "className": "Interstellar_Logistics_Station",
+            "name": "Interstellar Logistics Station",
+            "category": "interstellarLogistic",
+            "image": "/icons/interstellar-logistics-station.webp",
+            "url": "https://dsp-wiki.com/Interstellar_Logistics_Station",
+            "powerUsed": 300000,
+            "idlePower": 60,
+            "productionSpeed": 1,
+            "stack": 10,
+            "color": "#767f8a"
+        },
+        "Orbital_Collector": {
+            "className": "Orbital_Collector",
+            "name": "Orbital Collector",
+            "category": "extraction",
+            "image": "/icons/orbital-collector.webp",
+            "url": "https://dsp-wiki.com/Orbital_Collector",
+            "powerUsed": 30000,
+            "stack": 10,
+            "color": "#728196"
+        },
+        "Sorter_1": {
+            "className": "Sorter_1",
+            "name": "Sorter MK.I",
+            "category": "logistic",
+            "image": "/icons/sorter-1.webp",
+            "url": "https://dsp-wiki.com/Sorter_MK.I",
+            "powerUsed": 18,
+            "idlePower": 9,
+            "productionSpeed": 1,
+            "stack": 200,
+            "color": "#adaba7"
+        },
+        "Sorter_2": {
+            "className": "Sorter_2",
+            "name": "Sorter MK.II",
+            "category": "logistic",
+            "image": "/icons/sorter-2.webp",
+            "url": "https://dsp-wiki.com/Sorter_MK.II",
+            "powerUsed": 36,
+            "idlePower": 9,
+            "productionSpeed": 1,
+            "stack": 200,
+            "color": "#9babad"
+        },
+        "Sorter_3": {
+            "className": "Sorter_3",
+            "name": "Sorter MK.III",
+            "category": "logistic",
+            "image": "/icons/sorter-3.webp",
+            "url": "https://dsp-wiki.com/Sorter_MK.III",
+            "powerUsed": 72,
+            "idlePower": 9,
+            "productionSpeed": 1,
+            "stack": 200,
+            "color": "#9cabb8"
+        },
+        "Sorter_4": {
+            "className": "Sorter_4",
+            "name": "Pile Sorter",
+            "category": "logistic",
+            "image": "/icons/sorter-4.webp",
+            "url": "https://dsp-wiki.com/Pile_Sorter",
+            "powerUsed": 144,
+            "idlePower": 9,
+            "productionSpeed": 1,
+            "stack": 200,
+            "color": "#acb2b5"
+        },
+        "Mining_Machine": {
+            "className": "Mining_Machine",
+            "name": "Mining Machine",
+            "category": "extraction",
+            "image": "/icons/mining-machine.webp",
+            "url": "https://dsp-wiki.com/Mining_Machine",
+            "powerUsed": 420,
+            "extractionRate": 30,
+            "input": 6,
+            "stack": 50,
+            "color": "#908e9b"
+        },
+        "Advanced_Mining_Machine": {
+            "className": "Advanced_Mining_Machine",
+            "name": "Advanced Mining Machine",
+            "category": "extraction",
+            "image": "/icons/advanced-mining-machine.webp",
+            "url": "https://dsp-wiki.com/Advanced_Mining_Machine",
+            "powerUsed": 0,
+            "extractionRate": 60,
+            "input": 6,
+            "stack": 30,
+            "color": "#8a99c1"
+        },
+        "Water_Pump": {
+            "className": "Water_Pump",
+            "name": "Water Pump",
+            "category": "extraction",
+            "image": "/icons/water-pump.webp",
+            "url": "https://dsp-wiki.com/Water_Pump",
+            "powerUsed": 300,
+            "idlePower": 12,
+            "extractionRate": 50,
+            "stack": 30,
+            "color": "#82a1a7"
+        },
+        "Oil_Extractor": {
+            "className": "Oil_Extractor",
+            "name": "Oil Extractor",
+            "category": "extraction",
+            "image": "/icons/oil-extractor.webp",
+            "url": "https://dsp-wiki.com/Oil_Extractor",
+            "powerUsed": 840,
+            "idlePower": 24,
+            "extractionRate": 60,
+            "stack": 20,
+            "color": "#9fa7b6"
+        },
+        "Oil_Refinery": {
+            "className": "Oil_Refinery",
+            "name": "Oil Refinery",
+            "category": "production",
+            "image": "/icons/oil-refinery.webp",
+            "url": "https://dsp-wiki.com/Oil_Refinery",
+            "powerUsed": 960,
+            "idlePower": 24,
+            "productionSpeed": 1,
+            "stack": 30,
+            "color": "#949fb3"
+        },
+        "Fractionator": {
+            "className": "Fractionator",
+            "name": "Fractionator",
+            "category": "production",
+            "image": "/icons/fractionator.webp",
+            "url": "https://dsp-wiki.com/Fractionator",
+            "powerUsed": 720,
+            "idlePower": 18,
+            "stack": 30,
+            "color": "#7d909e"
+        },
+        "Chemical_Plant": {
+            "className": "Chemical_Plant",
+            "name": "Chemical Plant",
+            "category": "production",
+            "image": "/icons/chemical-plant.webp",
+            "url": "https://dsp-wiki.com/Chemical_Plant",
+            "powerUsed": 720,
+            "idlePower": 24,
+            "productionSpeed": 1,
+            "stack": 30,
+            "color": "#8b9596"
+        },
+        "Quantum_Chemical_Plant": {
+            "className": "Quantum_Chemical_Plant",
+            "name": "Quantum Chemical Plant",
+            "category": "production",
+            "image": "/icons/quantum-chemical-plant.webp",
+            "url": "https://dsp-wiki.com/Quantum_Chemical_Plant",
+            "powerUsed": 2160,
+            "idlePower": 36,
+            "productionSpeed": 2,
+            "stack": 30,
+            "color": "#819bbc"
+        },
+        "Miniature_Particle_Collider": {
+            "className": "Miniature_Particle_Collider",
+            "name": "Miniature Particle Collider",
+            "category": "production",
+            "image": "/icons/miniature-particle-collider.webp",
+            "url": "https://dsp-wiki.com/Miniature_Particle_Collider",
+            "powerUsed": 12000,
+            "idlePower": 120,
+            "productionSpeed": 1,
+            "stack": 20,
+            "color": "#667fa8"
+        },
+        "Arc_Smelter": {
+            "className": "Arc_Smelter",
+            "name": "Arc Smelter",
+            "category": "production",
+            "image": "/icons/arc-smelter.webp",
+            "url": "https://dsp-wiki.com/Arc_Smelter",
+            "powerUsed": 360,
+            "idlePower": 12,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#a1abb9"
+        },
+        "Plane_Smelter": {
+            "className": "Plane_Smelter",
+            "name": "Plane Smelter",
+            "category": "production",
+            "image": "/icons/plane-smelter.webp",
+            "url": "https://dsp-wiki.com/Plane_Smelter",
+            "powerUsed": 1440,
+            "idlePower": 48,
+            "productionSpeed": 2,
+            "stack": 50,
+            "color": "#b0a0a1"
+        },
+        "Df_Negentropy_Smelter": {
+            "className": "Df_Negentropy_Smelter",
+            "name": "Negentropy Smelter",
+            "category": "production",
+            "image": "/icons/df-negentropy-smelter.webp",
+            "url": "https://dsp-wiki.com/Negentropy_Smelter",
+            "powerUsed": 2880,
+            "idlePower": 96,
+            "productionSpeed": 3,
+            "stack": 50,
+            "color": "#869393"
+        },
+        "Assembling_Machine_Mk1": {
+            "className": "Assembling_Machine_Mk1",
+            "name": "Assembling Machine Mk.I",
+            "category": "production",
+            "image": "/icons/assembling-machine-1.webp",
+            "url": "https://dsp-wiki.com/Assembling_Machine_Mk.I",
+            "powerUsed": 270,
+            "idlePower": 12,
+            "productionSpeed": 0.75,
+            "stack": 50,
+            "color": "#a08b7a"
+        },
+        "Assembling_Machine_Mk2": {
+            "className": "Assembling_Machine_Mk2",
+            "name": "Assembling Machine Mk.II",
+            "category": "production",
+            "image": "/icons/assembling-machine-2.webp",
+            "url": "https://dsp-wiki.com/Assembling_Machine_Mk.II",
+            "powerUsed": 540,
+            "idlePower": 18,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#70a1a0"
+        },
+        "Assembling_Machine_Mk3": {
+            "className": "Assembling_Machine_Mk3",
+            "name": "Assembling Machine Mk.III",
+            "category": "production",
+            "image": "/icons/assembling-machine-3.webp",
+            "url": "https://dsp-wiki.com/Assembling_Machine_Mk.III",
+            "powerUsed": 1080,
+            "idlePower": 24,
+            "productionSpeed": 1.5,
+            "stack": 50,
+            "color": "#6f8fa2"
+        },
+        "Df_Recomposing_Assembler": {
+            "className": "Df_Recomposing_Assembler",
+            "name": "Re-composing Assembler",
+            "category": "production",
+            "image": "/icons/df-recomposing-assembler.webp",
+            "url": "https://dsp-wiki.com/Re-composing_Assembler",
+            "powerUsed": 2700,
+            "idlePower": 54,
+            "productionSpeed": 3,
+            "stack": 50,
+            "color": "#668083"
+        },
+        "Matrix_Lab": {
+            "className": "Matrix_Lab",
+            "name": "Matrix Lab",
+            "category": "production",
+            "image": "/icons/matrix-lab.webp",
+            "url": "https://dsp-wiki.com/Matrix_Lab",
+            "powerUsed": 480,
+            "idlePower": 12,
+            "productionSpeed": 1,
+            "stack": 50,
+            "color": "#839bb0"
+        },
+        "Df_Self_Evolution_Lab": {
+            "className": "Df_Self_Evolution_Lab",
+            "name": "Self-evolution Lab",
+            "category": "production",
+            "image": "/icons/df-self-evolution-lab.webp",
+            "url": "https://dsp-wiki.com/Self-evolution_Lab",
+            "powerUsed": 1920,
+            "idlePower": 48,
+            "productionSpeed": 3,
+            "stack": 50,
+            "color": "#5f8d94"
+        },
+        "Holo_Beacon": {
+            "className": "Holo_Beacon",
+            "name": "Holo Beacon",
+            "category": "special",
+            "image": "/icons/holo-beacon.webp",
+            "url": "https://dsp-wiki.com/Holo_Beacon",
+            "stack": 50,
+            "color": "#adc39c"
+        },
+        "Em_Rail_Ejector": {
+            "className": "Em_Rail_Ejector",
+            "name": "EM-Rail Ejector",
+            "category": "special",
+            "image": "/icons/em-rail-ejector.webp",
+            "url": "https://dsp-wiki.com/EM-Rail_Ejector",
+            "powerUsed": 1800,
+            "idlePower": 60,
+            "productionSpeed": 1,
+            "stack": 30,
+            "color": "#9098b5"
+        },
+        "Vertical_Launching_Silo": {
+            "className": "Vertical_Launching_Silo",
+            "name": "Vertical Launching Silo",
+            "category": "special",
+            "image": "/icons/vertical-launching-silo.webp",
+            "url": "https://dsp-wiki.com/Vertical_Launching_Silo",
+            "powerUsed": 18000,
+            "idlePower": 60,
+            "productionSpeed": 1,
+            "stack": 10,
+            "color": "#769fc1"
+        },
+        "Df_Gauss_Turret": {
+            "className": "Df_Gauss_Turret",
+            "name": "Gauss Turret",
+            "category": "special",
+            "image": "/icons/df-gauss-turret.webp",
+            "url": "https://dsp-wiki.com/Gauss_Turret",
+            "powerUsed": 210,
+            "idlePower": 9,
+            "stack": 50,
+            "color": "#a19082"
+        },
+        "Df_Missile_Turret": {
+            "className": "Df_Missile_Turret",
+            "name": "Missile Turret",
+            "category": "special",
+            "image": "/icons/df-missile-turret.webp",
+            "url": "https://dsp-wiki.com/Missile_Turret",
+            "powerUsed": 600,
+            "idlePower": 18,
+            "stack": 50,
+            "color": "#919481"
+        },
+        "Df_Implosion_Cannon": {
+            "className": "Df_Implosion_Cannon",
+            "name": "Implosion Cannon",
+            "category": "special",
+            "image": "/icons/df-implosion-cannon.webp",
+            "url": "https://dsp-wiki.com/Implosion_Cannon",
+            "powerUsed": 750,
+            "idlePower": 30,
+            "stack": 50,
+            "color": "#776b67"
+        },
+        "Df_Laser_Turret": {
+            "className": "Df_Laser_Turret",
+            "name": "Laser Turret",
+            "category": "special",
+            "image": "/icons/df-laser-turret.webp",
+            "url": "https://dsp-wiki.com/Laser_Turret",
+            "powerUsed": 3000,
+            "idlePower": 120,
+            "stack": 50,
+            "color": "#9398a7"
+        },
+        "Df_Plasma_Turret": {
+            "className": "Df_Plasma_Turret",
+            "name": "Plasma Turret",
+            "category": "special",
+            "image": "/icons/df-plasma-turret.webp",
+            "url": "https://dsp-wiki.com/Plasma_Turret",
+            "powerUsed": 1680,
+            "idlePower": 84,
+            "stack": 50,
+            "color": "#9997a8"
+        },
+        "Df_Plasma_Turret_Sr": {
+            "className": "Df_Plasma_Turret_Sr",
+            "name": "SR Plasma Turret",
+            "category": "special",
+            "image": "/icons/df-plasma-turret-sr.webp",
+            "url": "https://dsp-wiki.com/SR_Plasma_Turret",
+            "powerUsed": 4200,
+            "idlePower": 2100,
+            "stack": 20,
+            "color": "#a19ac7"
+        },
+        "Df_Battlefield_Analysis_Base": {
+            "className": "Df_Battlefield_Analysis_Base",
+            "name": "Battlefield Analysis Base",
+            "category": "special",
+            "image": "/icons/df-battlefield-analysis-base.webp",
+            "url": "https://dsp-wiki.com/Battlefield_Analysis_Base",
+            "powerUsed": 2400,
+            "idlePower": 60,
+            "stack": 20,
+            "color": "#929090"
+        },
+        "Df_Jammer_Tower": {
+            "className": "Df_Jammer_Tower",
+            "name": "Jammer Tower",
+            "category": "special",
+            "image": "/icons/df-jammer-tower.webp",
+            "url": "https://dsp-wiki.com/Jammer_Tower",
+            "powerUsed": 1200,
+            "idlePower": 90,
+            "stack": 50,
+            "color": "#727e9a"
+        },
+        "Df_Signal_Tower": {
+            "className": "Df_Signal_Tower",
+            "name": "Signal Tower",
+            "category": "special",
+            "image": "/icons/df-signal-tower.webp",
+            "url": "https://dsp-wiki.com/Signal_Tower",
+            "powerUsed": 9600,
+            "idlePower": 1350,
+            "stack": 20,
+            "color": "#7d8893"
+        },
+        "Df_Planetary_Shield_Generator": {
+            "className": "Df_Planetary_Shield_Generator",
+            "name": "Planetary Shield Generator",
+            "category": "special",
+            "image": "/icons/df-planetary-shield-generator.webp",
+            "url": "https://dsp-wiki.com/Planetary_Shield_Generator",
+            "powerUsed": 24000,
+            "idlePower": 12000,
+            "stack": 20,
+            "color": "#798a9c"
+        },
+        "Ray_Receiver_Pro": {
+            "className": "Ray_Receiver_Pro",
+            "name": "Ray Receiver (Graviton lens)",
+            "category": "generator",
+            "image": "/icons/ray-receiver-pro.webp",
+            "url": "https://dsp-wiki.com/Ray_Receiver_(Graviton_lens)",
+            "powerUsed": 0,
+            "stack": 20,
+            "color": "#728da8"
+        }
+    },
+    "itemsData": {
+        "Iron_Ore": {
+            "className": "Iron_Ore",
+            "name": "Iron Ore",
+            "category": "ore",
+            "image": "/icons/iron-ore.webp",
+            "url": "https://dsp-wiki.com/Iron_Ore",
+            "color": "#5a7c8e",
+            "stack": 100
+        },
+        "Copper_Ore": {
+            "className": "Copper_Ore",
+            "name": "Copper Ore",
+            "category": "ore",
+            "image": "/icons/copper-ore.webp",
+            "url": "https://dsp-wiki.com/Copper_Ore",
+            "color": "#a27d72",
+            "stack": 100
+        },
+        "Stone": {
+            "className": "Stone",
+            "name": "Stone",
+            "category": "ore",
+            "image": "/icons/stone.webp",
+            "url": "https://dsp-wiki.com/Stone",
+            "color": "#7a7d83",
+            "stack": 100
+        },
+        "Coal": {
+            "className": "Coal",
+            "name": "Coal",
+            "category": "ore",
+            "image": "/icons/coal.webp",
+            "url": "https://dsp-wiki.com/Coal",
+            "color": "#4d4955",
+            "stack": 100,
+            "energy": 2.7
+        },
+        "Silicon_Ore": {
+            "className": "Silicon_Ore",
+            "name": "Silicon Ore",
+            "category": "ore",
+            "image": "/icons/silicon-ore.webp",
+            "url": "https://dsp-wiki.com/Silicon_Ore",
+            "color": "#598b73",
+            "stack": 100
+        },
+        "Titanium_Ore": {
+            "className": "Titanium_Ore",
+            "name": "Titanium Ore",
+            "category": "ore",
+            "image": "/icons/titanium-ore.webp",
+            "url": "https://dsp-wiki.com/Titanium_Ore",
+            "color": "#b8c4ca",
+            "stack": 100
+        },
+        "Water": {
+            "className": "Water",
+            "name": "Water",
+            "category": "liquid",
+            "image": "/icons/water.webp",
+            "url": "https://dsp-wiki.com/Water",
+            "color": "#93a9b3",
+            "stack": 20
+        },
+        "Crude_Oil": {
+            "className": "Crude_Oil",
+            "name": "Crude Oil",
+            "category": "liquid",
+            "image": "/icons/crude-oil.webp",
+            "url": "https://dsp-wiki.com/Crude_Oil",
+            "color": "#3a3d48",
+            "stack": 20,
+            "energy": 4.05
+        },
+        "Hydrogen": {
+            "className": "Hydrogen",
+            "name": "Hydrogen",
+            "category": "material",
+            "image": "/icons/hydrogen.webp",
+            "url": "https://dsp-wiki.com/Hydrogen",
+            "color": "#9fc5ce",
+            "stack": 20,
+            "energy": 9
+        },
+        "Deuterium": {
+            "className": "Deuterium",
+            "name": "Deuterium",
+            "category": "material",
+            "image": "/icons/deuterium.webp",
+            "url": "https://dsp-wiki.com/Deuterium",
+            "color": "#a1c1c9",
+            "stack": 20,
+            "energy": 9
+        },
+        "Antimatter": {
+            "className": "Antimatter",
+            "name": "Antimatter",
+            "category": "material",
+            "image": "/icons/antimatter.webp",
+            "url": "https://dsp-wiki.com/Antimatter",
+            "color": "#536b7a",
+            "stack": 20
+        },
+        "Df_Core_Element": {
+            "className": "Df_Core_Element",
+            "name": "Core Element",
+            "category": "dark-fog",
+            "image": "/icons/df-core-element.webp",
+            "url": "https://dsp-wiki.com/Core_Element",
+            "color": "#c3ab4c",
+            "stack": 50
+        },
+        "Critical_Photon": {
+            "className": "Critical_Photon",
+            "name": "Critical Photon",
+            "category": "material",
+            "image": "/icons/critical-photon.webp",
+            "url": "https://dsp-wiki.com/Critical_Photon",
+            "color": "#607d82",
+            "stack": 100
+        },
+        "Kimberlite_Ore": {
+            "className": "Kimberlite_Ore",
+            "name": "Kimberlite Ore",
+            "category": "ore",
+            "image": "/icons/kimberlite-ore.webp",
+            "url": "https://dsp-wiki.com/Kimberlite_Ore",
+            "color": "#a9b0be",
+            "stack": 50
+        },
+        "Iron_Ingot": {
+            "className": "Iron_Ingot",
+            "name": "Iron Ingot",
+            "category": "material",
+            "image": "/icons/iron-ingot.webp",
+            "url": "https://dsp-wiki.com/Iron_Ingot",
+            "color": "#7a7f84",
+            "stack": 100
+        },
+        "Copper_Ingot": {
+            "className": "Copper_Ingot",
+            "name": "Copper Ingot",
+            "category": "material",
+            "image": "/icons/copper-ingot.webp",
+            "url": "https://dsp-wiki.com/Copper_Ingot",
+            "color": "#aa7460",
+            "stack": 100
+        },
+        "Stone_Brick": {
+            "className": "Stone_Brick",
+            "name": "Stone Brick",
+            "category": "material",
+            "image": "/icons/stone-brick.webp",
+            "url": "https://dsp-wiki.com/Stone_Brick",
+            "color": "#7c7a77",
+            "stack": 100
+        },
+        "Energetic_Graphite": {
+            "className": "Energetic_Graphite",
+            "name": "Energetic Graphite",
+            "category": "fuel",
+            "image": "/icons/energetic-graphite.webp",
+            "url": "https://dsp-wiki.com/Energetic_Graphite",
+            "color": "#4b515f",
+            "stack": 100,
+            "energy": 6.75
+        },
+        "High_Purity_Silicon": {
+            "className": "High_Purity_Silicon",
+            "name": "High-purity Silicon",
+            "category": "material",
+            "image": "/icons/high-purity-silicon.webp",
+            "url": "https://dsp-wiki.com/High-purity_Silicon",
+            "color": "#679c90",
+            "stack": 100
+        },
+        "Titanium_Ingot": {
+            "className": "Titanium_Ingot",
+            "name": "Titanium Ingot",
+            "category": "material",
+            "image": "/icons/titanium-ingot.webp",
+            "url": "https://dsp-wiki.com/Titanium_Ingot",
+            "color": "#d2d7dc",
+            "stack": 100
+        },
+        "Sulfuric_Acid": {
+            "className": "Sulfuric_Acid",
+            "name": "Sulfuric Acid",
+            "category": "liquid",
+            "image": "/icons/sulfuric-acid.webp",
+            "url": "https://dsp-wiki.com/Sulfuric_Acid",
+            "color": "#d4c573",
+            "stack": 20
+        },
+        "Refined_Oil": {
+            "className": "Refined_Oil",
+            "name": "Refined Oil",
+            "category": "liquid",
+            "image": "/icons/refined-oil.webp",
+            "url": "https://dsp-wiki.com/Refined_Oil",
+            "color": "#998371",
+            "stack": 20,
+            "energy": 4.5
+        },
+        "Hydrogen_Fuel_Rod": {
+            "className": "Hydrogen_Fuel_Rod",
+            "name": "Hydrogen Fuel Rod",
+            "category": "fuel",
+            "image": "/icons/hydrogen-fuel-rod.webp",
+            "url": "https://dsp-wiki.com/Hydrogen_Fuel_Rod",
+            "color": "#76858b",
+            "stack": 30,
+            "energy": 54
+        },
+        "Deuteron_Fuel_Rod": {
+            "className": "Deuteron_Fuel_Rod",
+            "name": "Deuteron Fuel Rod",
+            "category": "fuel",
+            "image": "/icons/deuteron-fuel-rod.webp",
+            "url": "https://dsp-wiki.com/Deuteron_Fuel_Rod",
+            "color": "#6e8273",
+            "stack": 30,
+            "energy": 600
+        },
+        "Antimatter_Fuel_Rod": {
+            "className": "Antimatter_Fuel_Rod",
+            "name": "Antimatter Fuel Rod",
+            "category": "fuel",
+            "image": "/icons/antimatter-fuel-rod.webp",
+            "url": "https://dsp-wiki.com/Antimatter_Fuel_Rod",
+            "color": "#656f76",
+            "stack": 30,
+            "energy": 7200
+        },
+        "Df_Strange_Annihilation_Fuel_Rod": {
+            "className": "Df_Strange_Annihilation_Fuel_Rod",
+            "name": "Strange Annihilation Fuel Rod",
+            "category": "fuel",
+            "image": "/icons/df-strange-annihilation-fuel-rod.webp",
+            "url": "https://dsp-wiki.com/Strange_Annihilation_Fuel_Rod",
+            "color": "#a19c6a",
+            "stack": 50,
+            "energy": 72000
+        },
+        "Df_Missile_Set": {
+            "className": "Df_Missile_Set",
+            "name": "Missile Set",
+            "category": "dark-fog",
+            "image": "/icons/df-missile-set.webp",
+            "url": "https://dsp-wiki.com/Missile_Set",
+            "color": "#938789",
+            "stack": 100
+        },
+        "Fractal_Silicon": {
+            "className": "Fractal_Silicon",
+            "name": "Fractal Silicon",
+            "category": "ore",
+            "image": "/icons/fractal-silicon.webp",
+            "url": "https://dsp-wiki.com/Fractal_Silicon",
+            "color": "#6a998d",
+            "stack": 50
+        },
+        "Magnet": {
+            "className": "Magnet",
+            "name": "Magnet",
+            "category": "material",
+            "image": "/icons/magnet.webp",
+            "url": "https://dsp-wiki.com/Magnet",
+            "color": "#4e4f4f",
+            "stack": 200
+        },
+        "Magnetic_Coil": {
+            "className": "Magnetic_Coil",
+            "name": "Magnetic Coil",
+            "category": "component",
+            "image": "/icons/magnetic-coil.webp",
+            "url": "https://dsp-wiki.com/Magnetic_Coil",
+            "color": "#655856",
+            "stack": 200
+        },
+        "Glass": {
+            "className": "Glass",
+            "name": "Glass",
+            "category": "material",
+            "image": "/icons/glass.webp",
+            "url": "https://dsp-wiki.com/Glass",
+            "color": "#5a948c",
+            "stack": 100
+        },
+        "Diamond": {
+            "className": "Diamond",
+            "name": "Diamond",
+            "category": "material",
+            "image": "/icons/diamond.webp",
+            "url": "https://dsp-wiki.com/Diamond",
+            "color": "#a1aab8",
+            "stack": 100,
+            "energy": 0.9
+        },
+        "Crystal_Silicon": {
+            "className": "Crystal_Silicon",
+            "name": "Crystal Silicon",
+            "category": "component",
+            "image": "/icons/crystal-silicon.webp",
+            "url": "https://dsp-wiki.com/Crystal_Silicon",
+            "color": "#4c806b",
+            "stack": 100
+        },
+        "Titanium_Alloy": {
+            "className": "Titanium_Alloy",
+            "name": "Titanium Alloy",
+            "category": "material",
+            "image": "/icons/titanium-alloy.webp",
+            "url": "https://dsp-wiki.com/Titanium_Alloy",
+            "color": "#929291",
+            "stack": 100
+        },
+        "Df_Combustible_Unit": {
+            "className": "Df_Combustible_Unit",
+            "name": "Combustible Unit",
+            "category": "dark-fog",
+            "image": "/icons/df-combustible-unit.webp",
+            "url": "https://dsp-wiki.com/Combustible_Unit",
+            "color": "#8e7a74",
+            "stack": 100,
+            "energy": 9.72
+        },
+        "Plastic": {
+            "className": "Plastic",
+            "name": "Plastic",
+            "category": "material",
+            "image": "/icons/plastic.webp",
+            "url": "https://dsp-wiki.com/Plastic",
+            "color": "#bab7b4",
+            "stack": 100
+        },
+        "Organic_Crystal": {
+            "className": "Organic_Crystal",
+            "name": "Organic Crystal",
+            "category": "ore",
+            "image": "/icons/organic-crystal.webp",
+            "url": "https://dsp-wiki.com/Organic_Crystal",
+            "color": "#a5a870",
+            "stack": 100,
+            "energy": 1.8
+        },
+        "Graphene": {
+            "className": "Graphene",
+            "name": "Graphene",
+            "category": "material",
+            "image": "/icons/graphene.webp",
+            "url": "https://dsp-wiki.com/Graphene",
+            "color": "#9c9999",
+            "stack": 100,
+            "energy": 0.096
+        },
+        "Annihilation_Constraint_Sphere": {
+            "className": "Annihilation_Constraint_Sphere",
+            "name": "Annihilation Constraint Sphere",
+            "category": "component",
+            "image": "/icons/annihilation-constraint-sphere.webp",
+            "url": "https://dsp-wiki.com/Annihilation_Constraint_Sphere",
+            "color": "#4a90c7",
+            "stack": 20
+        },
+        "Df_Magnum_Ammo_Box": {
+            "className": "Df_Magnum_Ammo_Box",
+            "name": "Magnum Ammo Box",
+            "category": "dark-fog",
+            "image": "/icons/df-magnum-ammo-box.webp",
+            "url": "https://dsp-wiki.com/Magnum_Ammo_Box",
+            "color": "#a4715c",
+            "stack": 100
+        },
+        "Df_Supersonic_Missile_Set": {
+            "className": "Df_Supersonic_Missile_Set",
+            "name": "Supersonic Missile Set",
+            "category": "dark-fog",
+            "image": "/icons/df-supersonic-missile-set.webp",
+            "url": "https://dsp-wiki.com/Supersonic_Missile_Set",
+            "color": "#948573",
+            "stack": 100
+        },
+        "Optical_Grating_Crystal": {
+            "className": "Optical_Grating_Crystal",
+            "name": "Grating Crystal",
+            "category": "ore",
+            "image": "/icons/optical-grating-crystal.webp",
+            "url": "https://dsp-wiki.com/Grating_Crystal",
+            "color": "#b194be",
+            "stack": 50
+        },
+        "Steel": {
+            "className": "Steel",
+            "name": "Steel",
+            "category": "material",
+            "image": "/icons/steel.webp",
+            "url": "https://dsp-wiki.com/Steel",
+            "color": "#8b8a8b",
+            "stack": 100
+        },
+        "Circuit_Board": {
+            "className": "Circuit_Board",
+            "name": "Circuit Board",
+            "category": "component",
+            "image": "/icons/circuit-board.webp",
+            "url": "https://dsp-wiki.com/Circuit_Board",
+            "color": "#628d75",
+            "stack": 200
+        },
+        "Prism": {
+            "className": "Prism",
+            "name": "Prism",
+            "category": "component",
+            "image": "/icons/prism.webp",
+            "url": "https://dsp-wiki.com/Prism",
+            "color": "#c7c6d5",
+            "stack": 100
+        },
+        "Electric_Motor": {
+            "className": "Electric_Motor",
+            "name": "Electric Motor",
+            "category": "component",
+            "image": "/icons/electric-motor.webp",
+            "url": "https://dsp-wiki.com/Electric_Motor",
+            "color": "#5f565b",
+            "stack": 100
+        },
+        "Microcrystalline_Component": {
+            "className": "Microcrystalline_Component",
+            "name": "Microcrystalline Component",
+            "category": "component",
+            "image": "/icons/microcrystalline-component.webp",
+            "url": "https://dsp-wiki.com/Microcrystalline_Component",
+            "color": "#6e92a0",
+            "stack": 200
+        },
+        "Proliferator_1": {
+            "className": "Proliferator_1",
+            "name": "Proliferator Mk.I",
+            "category": "special",
+            "image": "/icons/proliferator-1.webp",
+            "url": "https://dsp-wiki.com/Proliferator_Mk.I",
+            "color": "#967c5b",
+            "stack": 200,
+            "energy": 3.24
+        },
+        "Df_Explosive_Unit": {
+            "className": "Df_Explosive_Unit",
+            "name": "Explosive Unit",
+            "category": "dark-fog",
+            "image": "/icons/df-explosive-unit.webp",
+            "url": "https://dsp-wiki.com/Explosive_Unit",
+            "color": "#938574",
+            "stack": 100,
+            "energy": 21.6
+        },
+        "Strange_Matter": {
+            "className": "Strange_Matter",
+            "name": "Strange Matter",
+            "category": "material",
+            "image": "/icons/strange-matter.webp",
+            "url": "https://dsp-wiki.com/Strange_Matter",
+            "color": "#78b286",
+            "stack": 100
+        },
+        "Titanium_Crystal": {
+            "className": "Titanium_Crystal",
+            "name": "Titanium Crystal",
+            "category": "component",
+            "image": "/icons/titanium-crystal.webp",
+            "url": "https://dsp-wiki.com/Titanium_Crystal",
+            "color": "#cad3dc",
+            "stack": 100
+        },
+        "Carbon_Nanotube": {
+            "className": "Carbon_Nanotube",
+            "name": "Carbon Nanotube",
+            "category": "material",
+            "image": "/icons/carbon-nanotube.webp",
+            "url": "https://dsp-wiki.com/Carbon_Nanotube",
+            "color": "#dadbdd",
+            "stack": 100,
+            "energy": 0.084
+        },
+        "Particle_Broadband": {
+            "className": "Particle_Broadband",
+            "name": "Particle Broadband",
+            "category": "component",
+            "image": "/icons/particle-broadband.webp",
+            "url": "https://dsp-wiki.com/Particle_Broadband",
+            "color": "#6285bd",
+            "stack": 200
+        },
+        "Df_Titanium_Ammo_Box": {
+            "className": "Df_Titanium_Ammo_Box",
+            "name": "Titanium Ammo Box",
+            "category": "dark-fog",
+            "image": "/icons/df-titanium-ammo-box.webp",
+            "url": "https://dsp-wiki.com/Titanium_Ammo_Box",
+            "color": "#848998",
+            "stack": 100
+        },
+        "Df_Gravity_Missile_Set": {
+            "className": "Df_Gravity_Missile_Set",
+            "name": "Gravity Missile Set",
+            "category": "dark-fog",
+            "image": "/icons/df-gravity-missile-set.webp",
+            "url": "https://dsp-wiki.com/Gravity_Missile_Set",
+            "color": "#749789",
+            "stack": 100
+        },
+        "Spiniform_Stalagmite_Crystal": {
+            "className": "Spiniform_Stalagmite_Crystal",
+            "name": "Stalagmite Crystal",
+            "category": "ore",
+            "image": "/icons/spiniform-stalagmite-crystal.webp",
+            "url": "https://dsp-wiki.com/Stalagmite_Crystal",
+            "color": "#81cac4",
+            "stack": 50
+        },
+        "Gear": {
+            "className": "Gear",
+            "name": "Gear",
+            "category": "component",
+            "image": "/icons/gear.webp",
+            "url": "https://dsp-wiki.com/Gear",
+            "color": "#77797c",
+            "stack": 200
+        },
+        "Plasma_Exciter": {
+            "className": "Plasma_Exciter",
+            "name": "Plasma Exciter",
+            "category": "component",
+            "image": "/icons/plasma-exciter.webp",
+            "url": "https://dsp-wiki.com/Plasma_Exciter",
+            "color": "#8398cc",
+            "stack": 200
+        },
+        "Photon_Combiner": {
+            "className": "Photon_Combiner",
+            "name": "Photon Combiner",
+            "category": "component",
+            "image": "/icons/photon-combiner.webp",
+            "url": "https://dsp-wiki.com/Photon_Combiner",
+            "color": "#c073b1",
+            "stack": 200
+        },
+        "Electromagnetic_Turbine": {
+            "className": "Electromagnetic_Turbine",
+            "name": "Electromagnetic Turbine",
+            "category": "component",
+            "image": "/icons/electromagnetic-turbine.webp",
+            "url": "https://dsp-wiki.com/Electromagnetic_Turbine",
+            "color": "#506a64",
+            "stack": 100
+        },
+        "Processor": {
+            "className": "Processor",
+            "name": "Processor",
+            "category": "component",
+            "image": "/icons/processor.webp",
+            "url": "https://dsp-wiki.com/Processor",
+            "color": "#ad8c6f",
+            "stack": 200
+        },
+        "Proliferator_2": {
+            "className": "Proliferator_2",
+            "name": "Proliferator Mk.II",
+            "category": "special",
+            "image": "/icons/proliferator-2.webp",
+            "url": "https://dsp-wiki.com/Proliferator_Mk.II",
+            "color": "#59947d",
+            "stack": 200,
+            "energy": 8.856
+        },
+        "Df_Crystal_Explosive_Unit": {
+            "className": "Df_Crystal_Explosive_Unit",
+            "name": "Crystal Explosive Unit",
+            "category": "dark-fog",
+            "image": "/icons/df-crystal-explosive-unit.webp",
+            "url": "https://dsp-wiki.com/Crystal_Explosive_Unit",
+            "color": "#9081a1",
+            "stack": 100,
+            "energy": 54
+        },
+        "Casimir_Crystal": {
+            "className": "Casimir_Crystal",
+            "name": "Casimir Crystal",
+            "category": "component",
+            "image": "/icons/casimir-crystal.webp",
+            "url": "https://dsp-wiki.com/Casimir_Crystal",
+            "color": "#dfa7cb",
+            "stack": 100
+        },
+        "Titanium_Glass": {
+            "className": "Titanium_Glass",
+            "name": "Titanium Glass",
+            "category": "component",
+            "image": "/icons/titanium-glass.webp",
+            "url": "https://dsp-wiki.com/Titanium_Glass",
+            "color": "#739bb6",
+            "stack": 100
+        },
+        "Plane_Filter": {
+            "className": "Plane_Filter",
+            "name": "Plane Filter",
+            "category": "component",
+            "image": "/icons/plane-filter.webp",
+            "url": "https://dsp-wiki.com/Plane_Filter",
+            "color": "#85b9f4",
+            "stack": 200
+        },
+        "Quantum_Chip": {
+            "className": "Quantum_Chip",
+            "name": "Quantum Chip",
+            "category": "component",
+            "image": "/icons/quantum-chip.webp",
+            "url": "https://dsp-wiki.com/Quantum_Chip",
+            "color": "#6b93c4",
+            "stack": 200
+        },
+        "Df_Superalloy_Ammo_Box": {
+            "className": "Df_Superalloy_Ammo_Box",
+            "name": "Superalloy Ammo Box",
+            "category": "dark-fog",
+            "image": "/icons/df-superalloy-ammo-box.webp",
+            "url": "https://dsp-wiki.com/Superalloy_Ammo_Box",
+            "color": "#a78c5f",
+            "stack": 100
+        },
+        "Df_Shell_Set": {
+            "className": "Df_Shell_Set",
+            "name": "Shell Set",
+            "category": "dark-fog",
+            "image": "/icons/df-shell-set.webp",
+            "url": "https://dsp-wiki.com/Shell_Set",
+            "color": "#818386",
+            "stack": 100
+        },
+        "Unipolar_Magnet": {
+            "className": "Unipolar_Magnet",
+            "name": "Unipolar Magnet",
+            "category": "ore",
+            "image": "/icons/unipolar-magnet.webp",
+            "url": "https://dsp-wiki.com/Unipolar_Magnet",
+            "color": "#797776",
+            "stack": 50
+        },
+        "Df_Engine": {
+            "className": "Df_Engine",
+            "name": "Engine",
+            "category": "dark-fog",
+            "image": "/icons/df-engine.webp",
+            "url": "https://dsp-wiki.com/Engine",
+            "color": "#a89a83",
+            "stack": 200
+        },
+        "Thruster": {
+            "className": "Thruster",
+            "name": "Thruster",
+            "category": "component",
+            "image": "/icons/thruster.webp",
+            "url": "https://dsp-wiki.com/Thruster",
+            "color": "#9cafc1",
+            "stack": 200
+        },
+        "Reinforced_Thruster": {
+            "className": "Reinforced_Thruster",
+            "name": "Reinforced Thruster",
+            "category": "component",
+            "image": "/icons/reinforced-thruster.webp",
+            "url": "https://dsp-wiki.com/Reinforced_Thruster",
+            "color": "#92a9c1",
+            "stack": 100
+        },
+        "Super_Magnetic_Ring": {
+            "className": "Super_Magnetic_Ring",
+            "name": "Super-magnetic Ring",
+            "category": "component",
+            "image": "/icons/super-magnetic-ring.webp",
+            "url": "https://dsp-wiki.com/Super-magnetic_Ring",
+            "color": "#648ea9",
+            "stack": 100
+        },
+        "Particle_Container": {
+            "className": "Particle_Container",
+            "name": "Particle Container",
+            "category": "component",
+            "image": "/icons/particle-container.webp",
+            "url": "https://dsp-wiki.com/Particle_Container",
+            "color": "#aa90c0",
+            "stack": 100
+        },
+        "Proliferator_3": {
+            "className": "Proliferator_3",
+            "name": "Proliferator Mk.III",
+            "category": "special",
+            "image": "/icons/proliferator-3.webp",
+            "url": "https://dsp-wiki.com/Proliferator_Mk.III",
+            "color": "#5b8095",
+            "stack": 200,
+            "energy": 21.255
+        },
+        "Df_Prototype": {
+            "className": "Df_Prototype",
+            "name": "Prototype",
+            "category": "dark-fog",
+            "image": "/icons/df-prototype.webp",
+            "url": "https://dsp-wiki.com/Prototype",
+            "color": "#8f8390",
+            "stack": 100
+        },
+        "Df_Precision_Drone": {
+            "className": "Df_Precision_Drone",
+            "name": "Precision Drone",
+            "category": "dark-fog",
+            "image": "/icons/df-precision-drone.webp",
+            "url": "https://dsp-wiki.com/Precision_Drone",
+            "color": "#8e8b94",
+            "stack": 100
+        },
+        "Df_Attack_Drone": {
+            "className": "Df_Attack_Drone",
+            "name": "Attack Drone",
+            "category": "dark-fog",
+            "image": "/icons/df-attack-drone.webp",
+            "url": "https://dsp-wiki.com/Attack_Drone",
+            "color": "#968a91",
+            "stack": 100
+        },
+        "Df_Corvette": {
+            "className": "Df_Corvette",
+            "name": "Corvette",
+            "category": "dark-fog",
+            "image": "/icons/df-corvette.webp",
+            "url": "https://dsp-wiki.com/Corvette",
+            "color": "#868383",
+            "stack": 50
+        },
+        "Df_Destroyer": {
+            "className": "Df_Destroyer",
+            "name": "Destroyer",
+            "category": "dark-fog",
+            "image": "/icons/df-destroyer.webp",
+            "url": "https://dsp-wiki.com/Destroyer",
+            "color": "#857b75",
+            "stack": 50
+        },
+        "Df_Plasma_Capsule": {
+            "className": "Df_Plasma_Capsule",
+            "name": "Plasma Capsule",
+            "category": "dark-fog",
+            "image": "/icons/df-plasma-capsule.webp",
+            "url": "https://dsp-wiki.com/Plasma_Capsule",
+            "color": "#488d7b",
+            "stack": 100
+        },
+        "Df_High_Explosive_Shell_Set": {
+            "className": "Df_High_Explosive_Shell_Set",
+            "name": "High-Explosive Shell Set",
+            "category": "dark-fog",
+            "image": "/icons/df-high-explosive-shell-set.webp",
+            "url": "https://dsp-wiki.com/High-Explosive_Shell_Set",
+            "color": "#9d8e76",
+            "stack": 100
+        },
+        "Fire_Ice": {
+            "className": "Fire_Ice",
+            "name": "Fire Ice",
+            "category": "ore",
+            "image": "/icons/fire-ice.webp",
+            "url": "https://dsp-wiki.com/Fire_Ice",
+            "color": "#dfe3e8",
+            "stack": 50,
+            "energy": 4.8
+        },
+        "Logistics_Bot": {
+            "className": "Logistics_Bot",
+            "name": "Logistics Bot",
+            "category": "special",
+            "image": "/icons/logistics-bot.webp",
+            "url": "https://dsp-wiki.com/Logistics_Bot",
+            "color": "#7a8ebd",
+            "stack": 200
+        },
+        "Logistics_Drone": {
+            "className": "Logistics_Drone",
+            "name": "Logistics Drone",
+            "category": "special",
+            "image": "/icons/logistics-drone.webp",
+            "url": "https://dsp-wiki.com/Logistics_Drone",
+            "color": "#a0b0bf",
+            "stack": 200
+        },
+        "Logistics_Vessel": {
+            "className": "Logistics_Vessel",
+            "name": "Interstellar Logistics Vessel",
+            "category": "special",
+            "image": "/icons/logistics-vessel.webp",
+            "url": "https://dsp-wiki.com/Interstellar_Logistics_Vessel",
+            "color": "#a0a6a9",
+            "stack": 50
+        },
+        "Space_Warper": {
+            "className": "Space_Warper",
+            "name": "Space Warper",
+            "category": "component",
+            "image": "/icons/space-warper.webp",
+            "url": "https://dsp-wiki.com/Space_Warper",
+            "color": "#807b6c",
+            "stack": 100
+        },
+        "Graviton_Lens": {
+            "className": "Graviton_Lens",
+            "name": "Graviton Lens",
+            "category": "component",
+            "image": "/icons/graviton-lens.webp",
+            "url": "https://dsp-wiki.com/Graviton_Lens",
+            "color": "#629a86",
+            "stack": 100,
+            "energy": 1
+        },
+        "Foundation": {
+            "className": "Foundation",
+            "name": "Foundation",
+            "category": "special",
+            "image": "/icons/foundation.webp",
+            "url": "https://dsp-wiki.com/Foundation",
+            "color": "#b0b0b7",
+            "stack": 1000
+        },
+        "Solar_Sail": {
+            "className": "Solar_Sail",
+            "name": "Solar Sail",
+            "category": "special",
+            "image": "/icons/solar-sail.webp",
+            "url": "https://dsp-wiki.com/Solar_Sail",
+            "color": "#a9c5db",
+            "stack": 200
+        },
+        "Frame_Material": {
+            "className": "Frame_Material",
+            "name": "Frame Material",
+            "category": "component",
+            "image": "/icons/frame-material.webp",
+            "url": "https://dsp-wiki.com/Frame_Material",
+            "color": "#838c8d",
+            "stack": 100
+        },
+        "Dyson_Sphere_Component": {
+            "className": "Dyson_Sphere_Component",
+            "name": "Dyson Sphere Component",
+            "category": "special",
+            "image": "/icons/dyson-sphere-component.webp",
+            "url": "https://dsp-wiki.com/Dyson_Sphere_Component",
+            "color": "#7392a4",
+            "stack": 100
+        },
+        "Small_Carrier_Rocket": {
+            "className": "Small_Carrier_Rocket",
+            "name": "Small Carrier Rocket",
+            "category": "special",
+            "image": "/icons/small-carrier-rocket.webp",
+            "url": "https://dsp-wiki.com/Small_Carrier_Rocket",
+            "color": "#6585a0",
+            "stack": 20
+        },
+        "Df_Antimatter_Capsule": {
+            "className": "Df_Antimatter_Capsule",
+            "name": "Antimatter Capsule",
+            "category": "dark-fog",
+            "image": "/icons/df-antimatter-capsule.webp",
+            "url": "https://dsp-wiki.com/Antimatter_Capsule",
+            "color": "#564b72",
+            "stack": 100
+        },
+        "Df_Crystal_Shell_Set": {
+            "className": "Df_Crystal_Shell_Set",
+            "name": "Crystal Shell Set",
+            "category": "dark-fog",
+            "image": "/icons/df-crystal-shell-set.webp",
+            "url": "https://dsp-wiki.com/Crystal_Shell_Set",
+            "color": "#a184ab",
+            "stack": 100
+        },
+        "Log": {
+            "className": "Log",
+            "name": "Log",
+            "category": "fuel",
+            "image": "/icons/log.webp",
+            "url": "https://dsp-wiki.com/Log",
+            "color": "#856252",
+            "stack": 100,
+            "energy": 1.5
+        },
+        "Electromagnetic_Matrix": {
+            "className": "Electromagnetic_Matrix",
+            "name": "Electromagnetic Matrix",
+            "category": "science-matrix",
+            "image": "/icons/electromagnetic-matrix.webp",
+            "url": "https://dsp-wiki.com/Electromagnetic_Matrix",
+            "color": "#4492c8",
+            "stack": 200
+        },
+        "Energy_Matrix": {
+            "className": "Energy_Matrix",
+            "name": "Energy Matrix",
+            "category": "science-matrix",
+            "image": "/icons/energy-matrix.webp",
+            "url": "https://dsp-wiki.com/Energy_Matrix",
+            "color": "#de6472",
+            "stack": 200
+        },
+        "Structure_Matrix": {
+            "className": "Structure_Matrix",
+            "name": "Structure Matrix",
+            "category": "science-matrix",
+            "image": "/icons/structure-matrix.webp",
+            "url": "https://dsp-wiki.com/Structure_Matrix",
+            "color": "#ecb029",
+            "stack": 200
+        },
+        "Information_Matrix": {
+            "className": "Information_Matrix",
+            "name": "Information Matrix",
+            "category": "science-matrix",
+            "image": "/icons/information-matrix.webp",
+            "url": "https://dsp-wiki.com/Information_Matrix",
+            "color": "#9c62dd",
+            "stack": 200
+        },
+        "Gravity_Matrix": {
+            "className": "Gravity_Matrix",
+            "name": "Gravity Matrix",
+            "category": "science-matrix",
+            "image": "/icons/gravity-matrix.webp",
+            "url": "https://dsp-wiki.com/Gravity_Matrix",
+            "color": "#53bf5c",
+            "stack": 200
+        },
+        "Universe_Matrix": {
+            "className": "Universe_Matrix",
+            "name": "Universe Matrix",
+            "category": "science-matrix",
+            "image": "/icons/universe-matrix.webp",
+            "url": "https://dsp-wiki.com/Universe_Matrix",
+            "color": "#b7c0d5",
+            "stack": 200
+        },
+        "Df_Dark_Fog_Matrix": {
+            "className": "Df_Dark_Fog_Matrix",
+            "name": "Dark Fog Matrix",
+            "category": "dark-fog",
+            "image": "/icons/df-dark-fog-matrix.webp",
+            "url": "https://dsp-wiki.com/Dark_Fog_Matrix",
+            "color": "#5dccc2",
+            "stack": 200
+        },
+        "Df_Energy_Shard": {
+            "className": "Df_Energy_Shard",
+            "name": "Energy Shard",
+            "category": "dark-fog",
+            "image": "/icons/df-energy-shard.webp",
+            "url": "https://dsp-wiki.com/Energy_Shard",
+            "color": "#466b6b",
+            "stack": 100,
+            "energy": 3.6
+        },
+        "Df_Silicon_Based_Neuron": {
+            "className": "Df_Silicon_Based_Neuron",
+            "name": "Silicon-based Neuron",
+            "category": "dark-fog",
+            "image": "/icons/df-silicon-based-neuron.webp",
+            "url": "https://dsp-wiki.com/Silicon-based_Neuron",
+            "color": "#397f7b",
+            "stack": 100
+        },
+        "Df_Negentropy_Singularity": {
+            "className": "Df_Negentropy_Singularity",
+            "name": "Negentropy Singularity",
+            "category": "dark-fog",
+            "image": "/icons/df-negentropy-singularity.webp",
+            "url": "https://dsp-wiki.com/Negentropy_Singularity",
+            "color": "#4f7371",
+            "stack": 50
+        },
+        "Df_Matter_Recombinator": {
+            "className": "Df_Matter_Recombinator",
+            "name": "Matter Recombinator",
+            "category": "dark-fog",
+            "image": "/icons/df-matter-recombinator.webp",
+            "url": "https://dsp-wiki.com/Matter_Recombinator",
+            "color": "#528985",
+            "stack": 100
+        },
+        "Df_Jamming_Capsule": {
+            "className": "Df_Jamming_Capsule",
+            "name": "Jamming Capsule",
+            "category": "dark-fog",
+            "image": "/icons/df-jamming-capsule.webp",
+            "url": "https://dsp-wiki.com/Jamming_Capsule",
+            "color": "#618ca8",
+            "stack": 100
+        },
+        "Df_Suppressing_Capsule": {
+            "className": "Df_Suppressing_Capsule",
+            "name": "Suppressing Capsule",
+            "category": "dark-fog",
+            "image": "/icons/df-suppressing-capsule.webp",
+            "url": "https://dsp-wiki.com/Suppressing_Capsule",
+            "color": "#a79875",
+            "stack": 100
+        },
+        "Plant_Fuel": {
+            "className": "Plant_Fuel",
+            "name": "Plant Fuel",
+            "category": "fuel",
+            "image": "/icons/plant-fuel.webp",
+            "url": "https://dsp-wiki.com/Plant_Fuel",
+            "color": "#617842",
+            "stack": 500,
+            "energy": 0.5
+        }
+    },
+    "recipesData": {
+        "Recipe_Tesla_Tower": {
+            "className": "Recipe_Tesla_Tower",
+            "name": "Tesla Tower",
+            "ingredients": {
+                "Iron_Ingot": 2,
+                "Magnetic_Coil": 1
+            },
+            "produce": {
+                "Tesla_Tower": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Wireless_Power_Tower": {
+            "className": "Recipe_Wireless_Power_Tower",
+            "name": "Wireless Power Tower",
+            "ingredients": {
+                "Plasma_Exciter": 3,
+                "Tesla_Tower": 1
+            },
+            "produce": {
+                "Wireless_Power_Tower": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Satellite_Substation": {
+            "className": "Recipe_Satellite_Substation",
+            "name": "Satellite Substation",
+            "ingredients": {
+                "Frame_Material": 2,
+                "Super_Magnetic_Ring": 10,
+                "Wireless_Power_Tower": 1
+            },
+            "produce": {
+                "Satellite_Substation": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Wind_Turbine": {
+            "className": "Recipe_Wind_Turbine",
+            "name": "Wind Turbine",
+            "ingredients": {
+                "Gear": 1,
+                "Iron_Ingot": 6,
+                "Magnetic_Coil": 3
+            },
+            "produce": {
+                "Wind_Turbine": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Thermal_Power_Plant": {
+            "className": "Recipe_Thermal_Power_Plant",
+            "name": "Thermal Power Plant",
+            "ingredients": {
+                "Gear": 4,
+                "Iron_Ingot": 10,
+                "Magnetic_Coil": 4,
+                "Stone_Brick": 4
+            },
+            "produce": {
+                "Thermal_Power_Plant": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Solar_Panel": {
+            "className": "Recipe_Solar_Panel",
+            "name": "Solar Panel",
+            "ingredients": {
+                "Circuit_Board": 5,
+                "Copper_Ingot": 10,
+                "High_Purity_Silicon": 10
+            },
+            "produce": {
+                "Solar_Panel": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Accumulator": {
+            "className": "Recipe_Accumulator",
+            "name": "Accumulator",
+            "ingredients": {
+                "Crystal_Silicon": 3,
+                "Iron_Ingot": 6,
+                "Super_Magnetic_Ring": 1
+            },
+            "produce": {
+                "Accumulator": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Geothermal_Power_Station": {
+            "className": "Recipe_Geothermal_Power_Station",
+            "name": "Geothermal Power Station",
+            "ingredients": {
+                "Copper_Ingot": 20,
+                "Photon_Combiner": 4,
+                "Steel": 15,
+                "Super_Magnetic_Ring": 1
+            },
+            "produce": {
+                "Geothermal_Power_Station": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Mini_Fusion_Power_Plant": {
+            "className": "Recipe_Mini_Fusion_Power_Plant",
+            "name": "Mini Fusion Power Plant",
+            "ingredients": {
+                "Carbon_Nanotube": 8,
+                "Processor": 4,
+                "Super_Magnetic_Ring": 10,
+                "Titanium_Alloy": 12
+            },
+            "produce": {
+                "Mini_Fusion_Power_Plant": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Energy_Exchanger": {
+            "className": "Recipe_Energy_Exchanger",
+            "name": "Energy Exchanger",
+            "ingredients": {
+                "Particle_Container": 8,
+                "Processor": 40,
+                "Steel": 40,
+                "Titanium_Alloy": 40
+            },
+            "produce": {
+                "Energy_Exchanger": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 15,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Ray_Receiver": {
+            "className": "Recipe_Ray_Receiver",
+            "name": "Ray Receiver",
+            "ingredients": {
+                "High_Purity_Silicon": 20,
+                "Photon_Combiner": 10,
+                "Processor": 5,
+                "Steel": 20,
+                "Super_Magnetic_Ring": 20
+            },
+            "produce": {
+                "Ray_Receiver": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Artificial_Star": {
+            "className": "Recipe_Artificial_Star",
+            "name": "Artificial Star",
+            "ingredients": {
+                "Annihilation_Constraint_Sphere": 10,
+                "Frame_Material": 20,
+                "Quantum_Chip": 10,
+                "Titanium_Alloy": 20
+            },
+            "produce": {
+                "Artificial_Star": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 30,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Accumulator_Discharge": {
+            "className": "Recipe_Accumulator_Discharge",
+            "name": "Accumulator (Discharge)",
+            "ingredients": {
+                "Accumulator_Full": 1
+            },
+            "produce": {
+                "Accumulator": 1
+            },
+            "mProducedIn": [
+                "Energy_Exchanger"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Accumulator_Full": {
+            "className": "Recipe_Accumulator_Full",
+            "name": "Accumulator (full)",
+            "ingredients": {
+                "Accumulator": 1
+            },
+            "produce": {
+                "Accumulator_Full": 1
+            },
+            "mProducedIn": [
+                "Energy_Exchanger"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_ConveyorBeltMk1": {
+            "className": "Recipe_ConveyorBeltMk1",
+            "name": "Conveyor Belt MK.I",
+            "ingredients": {
+                "Gear": 1,
+                "Iron_Ingot": 2
+            },
+            "produce": {
+                "ConveyorBeltMk1": 3
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_ConveyorBeltMk2": {
+            "className": "Recipe_ConveyorBeltMk2",
+            "name": "Conveyor Belt MK.II",
+            "ingredients": {
+                "ConveyorBeltMk1": 3,
+                "Electromagnetic_Turbine": 1
+            },
+            "produce": {
+                "ConveyorBeltMk2": 3
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_ConveyorBeltMk3": {
+            "className": "Recipe_ConveyorBeltMk3",
+            "name": "Conveyor Belt MK.III",
+            "ingredients": {
+                "ConveyorBeltMk2": 3,
+                "Graphene": 1,
+                "Super_Magnetic_Ring": 1
+            },
+            "produce": {
+                "ConveyorBeltMk3": 3
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Splitter": {
+            "className": "Recipe_Splitter",
+            "name": "Splitter",
+            "ingredients": {
+                "Circuit_Board": 1,
+                "Gear": 2,
+                "Iron_Ingot": 3
+            },
+            "produce": {
+                "Splitter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Automatic_Piler": {
+            "className": "Recipe_Automatic_Piler",
+            "name": "Automatic Piler",
+            "ingredients": {
+                "Gear": 4,
+                "Processor": 2,
+                "Steel": 3,
+                "Super_Magnetic_Ring": 1
+            },
+            "produce": {
+                "Automatic_Piler": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Traffic_Monitor": {
+            "className": "Recipe_Traffic_Monitor",
+            "name": "Traffic Monitor",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Gear": 2,
+                "Glass": 1,
+                "Iron_Ingot": 3
+            },
+            "produce": {
+                "Traffic_Monitor": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Spray_Coater": {
+            "className": "Recipe_Spray_Coater",
+            "name": "Spray Coater",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Microcrystalline_Component": 2,
+                "Plasma_Exciter": 2,
+                "Steel": 4
+            },
+            "produce": {
+                "Spray_Coater": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Storage_1": {
+            "className": "Recipe_Storage_1",
+            "name": "Depot MK.I",
+            "ingredients": {
+                "Iron_Ingot": 4,
+                "Stone_Brick": 4
+            },
+            "produce": {
+                "Storage_1": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Storage_2": {
+            "className": "Recipe_Storage_2",
+            "name": "Depot MK.II",
+            "ingredients": {
+                "Steel": 8,
+                "Stone_Brick": 8
+            },
+            "produce": {
+                "Storage_2": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Storage_Tank": {
+            "className": "Recipe_Storage_Tank",
+            "name": "Storage Tank",
+            "ingredients": {
+                "Glass": 4,
+                "Iron_Ingot": 8,
+                "Stone_Brick": 4
+            },
+            "produce": {
+                "Storage_Tank": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Logistics_Distributor": {
+            "className": "Recipe_Logistics_Distributor",
+            "name": "Logistics Distributor",
+            "ingredients": {
+                "Iron_Ingot": 8,
+                "Plasma_Exciter": 4,
+                "Processor": 4
+            },
+            "produce": {
+                "Logistics_Distributor": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Planetary_Logistics_Station": {
+            "className": "Recipe_Planetary_Logistics_Station",
+            "name": "Planetary Logistics Station",
+            "ingredients": {
+                "Particle_Container": 20,
+                "Processor": 40,
+                "Steel": 40,
+                "Titanium_Ingot": 40
+            },
+            "produce": {
+                "Planetary_Logistics_Station": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 20,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Interstellar_Logistics_Station": {
+            "className": "Recipe_Interstellar_Logistics_Station",
+            "name": "Interstellar Logistics Station",
+            "ingredients": {
+                "Particle_Container": 20,
+                "Planetary_Logistics_Station": 1,
+                "Titanium_Alloy": 40
+            },
+            "produce": {
+                "Interstellar_Logistics_Station": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 30,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Orbital_Collector": {
+            "className": "Recipe_Orbital_Collector",
+            "name": "Orbital Collector",
+            "ingredients": {
+                "Accumulator_Full": 20,
+                "Interstellar_Logistics_Station": 1,
+                "Reinforced_Thruster": 20,
+                "Super_Magnetic_Ring": 50
+            },
+            "produce": {
+                "Orbital_Collector": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 30,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sorter_1": {
+            "className": "Recipe_Sorter_1",
+            "name": "Sorter MK.I",
+            "ingredients": {
+                "Circuit_Board": 1,
+                "Iron_Ingot": 1
+            },
+            "produce": {
+                "Sorter_1": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sorter_2": {
+            "className": "Recipe_Sorter_2",
+            "name": "Sorter MK.II",
+            "ingredients": {
+                "Electric_Motor": 1,
+                "Sorter_1": 2
+            },
+            "produce": {
+                "Sorter_2": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sorter_3": {
+            "className": "Recipe_Sorter_3",
+            "name": "Sorter MK.III",
+            "ingredients": {
+                "Electromagnetic_Turbine": 1,
+                "Sorter_2": 2
+            },
+            "produce": {
+                "Sorter_3": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sorter_4": {
+            "className": "Recipe_Sorter_4",
+            "name": "Pile Sorter",
+            "ingredients": {
+                "Processor": 1,
+                "Sorter_3": 2,
+                "Super_Magnetic_Ring": 1
+            },
+            "produce": {
+                "Sorter_4": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Mining_Machine": {
+            "className": "Recipe_Mining_Machine",
+            "name": "Mining Machine",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Gear": 2,
+                "Iron_Ingot": 4,
+                "Magnetic_Coil": 2
+            },
+            "produce": {
+                "Mining_Machine": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Advanced_Mining_Machine": {
+            "className": "Recipe_Advanced_Mining_Machine",
+            "name": "Advanced Mining Machine",
+            "ingredients": {
+                "Frame_Material": 10,
+                "Optical_Grating_Crystal": 40,
+                "Quantum_Chip": 4,
+                "Super_Magnetic_Ring": 10,
+                "Titanium_Alloy": 20
+            },
+            "produce": {
+                "Advanced_Mining_Machine": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 20,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Water_Pump": {
+            "className": "Recipe_Water_Pump",
+            "name": "Water Pump",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Electric_Motor": 4,
+                "Iron_Ingot": 8,
+                "Stone_Brick": 4
+            },
+            "produce": {
+                "Water_Pump": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Oil_Extractor": {
+            "className": "Recipe_Oil_Extractor",
+            "name": "Oil Extractor",
+            "ingredients": {
+                "Circuit_Board": 6,
+                "Plasma_Exciter": 4,
+                "Steel": 12,
+                "Stone_Brick": 12
+            },
+            "produce": {
+                "Oil_Extractor": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Oil_Refinery": {
+            "className": "Recipe_Oil_Refinery",
+            "name": "Oil Refinery",
+            "ingredients": {
+                "Circuit_Board": 6,
+                "Plasma_Exciter": 6,
+                "Steel": 10,
+                "Stone_Brick": 10
+            },
+            "produce": {
+                "Oil_Refinery": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Fractionator": {
+            "className": "Recipe_Fractionator",
+            "name": "Fractionator",
+            "ingredients": {
+                "Glass": 4,
+                "Processor": 1,
+                "Steel": 8,
+                "Stone_Brick": 4
+            },
+            "produce": {
+                "Fractionator": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Chemical_Plant": {
+            "className": "Recipe_Chemical_Plant",
+            "name": "Chemical Plant",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Glass": 8,
+                "Steel": 8,
+                "Stone_Brick": 8
+            },
+            "produce": {
+                "Chemical_Plant": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Quantum_Chemical_Plant": {
+            "className": "Recipe_Quantum_Chemical_Plant",
+            "name": "Quantum Chemical Plant",
+            "ingredients": {
+                "Chemical_Plant": 1,
+                "Quantum_Chip": 3,
+                "Strange_Matter": 3,
+                "Titanium_Glass": 10
+            },
+            "produce": {
+                "Quantum_Chemical_Plant": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Miniature_Particle_Collider": {
+            "className": "Recipe_Miniature_Particle_Collider",
+            "name": "Miniature Particle Collider",
+            "ingredients": {
+                "Frame_Material": 20,
+                "Graphene": 10,
+                "Processor": 8,
+                "Super_Magnetic_Ring": 25,
+                "Titanium_Alloy": 20
+            },
+            "produce": {
+                "Miniature_Particle_Collider": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 15,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Arc_Smelter": {
+            "className": "Recipe_Arc_Smelter",
+            "name": "Arc Smelter",
+            "ingredients": {
+                "Circuit_Board": 4,
+                "Iron_Ingot": 4,
+                "Magnetic_Coil": 2,
+                "Stone_Brick": 2
+            },
+            "produce": {
+                "Arc_Smelter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Plane_Smelter": {
+            "className": "Recipe_Plane_Smelter",
+            "name": "Plane Smelter",
+            "ingredients": {
+                "Arc_Smelter": 1,
+                "Frame_Material": 5,
+                "Plane_Filter": 4,
+                "Unipolar_Magnet": 15
+            },
+            "produce": {
+                "Plane_Smelter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Negentropy_Smelter": {
+            "className": "Recipe_Df_Negentropy_Smelter",
+            "name": "Negentropy Smelter",
+            "ingredients": {
+                "Df_Energy_Shard": 30,
+                "Df_Negentropy_Singularity": 10,
+                "Plane_Smelter": 1,
+                "Quantum_Chip": 4
+            },
+            "produce": {
+                "Df_Negentropy_Smelter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Assembling_Machine_Mk1": {
+            "className": "Recipe_Assembling_Machine_Mk1",
+            "name": "Assembling Machine Mk.I",
+            "ingredients": {
+                "Circuit_Board": 4,
+                "Gear": 8,
+                "Iron_Ingot": 4
+            },
+            "produce": {
+                "Assembling_Machine_Mk1": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Assembling_Machine_Mk2": {
+            "className": "Recipe_Assembling_Machine_Mk2",
+            "name": "Assembling Machine Mk.II",
+            "ingredients": {
+                "Assembling_Machine_Mk1": 1,
+                "Graphene": 8,
+                "Processor": 4
+            },
+            "produce": {
+                "Assembling_Machine_Mk2": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Assembling_Machine_Mk3": {
+            "className": "Recipe_Assembling_Machine_Mk3",
+            "name": "Assembling Machine Mk.III",
+            "ingredients": {
+                "Assembling_Machine_Mk2": 1,
+                "Particle_Broadband": 8,
+                "Quantum_Chip": 2
+            },
+            "produce": {
+                "Assembling_Machine_Mk3": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Recomposing_Assembler": {
+            "className": "Recipe_Df_Recomposing_Assembler",
+            "name": "Re-composing Assembler",
+            "ingredients": {
+                "Assembling_Machine_Mk3": 1,
+                "Df_Energy_Shard": 30,
+                "Df_Matter_Recombinator": 10,
+                "Quantum_Chip": 4
+            },
+            "produce": {
+                "Df_Recomposing_Assembler": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Matrix_Lab": {
+            "className": "Recipe_Matrix_Lab",
+            "name": "Matrix Lab",
+            "ingredients": {
+                "Circuit_Board": 4,
+                "Glass": 4,
+                "Iron_Ingot": 8,
+                "Magnetic_Coil": 4
+            },
+            "produce": {
+                "Matrix_Lab": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Self_Evolution_Lab": {
+            "className": "Recipe_Df_Self_Evolution_Lab",
+            "name": "Self-evolution Lab",
+            "ingredients": {
+                "Df_Dark_Fog_Matrix": 20,
+                "Df_Silicon_Based_Neuron": 10,
+                "Matrix_Lab": 1,
+                "Quantum_Chip": 4
+            },
+            "produce": {
+                "Df_Self_Evolution_Lab": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Holo_Beacon": {
+            "className": "Recipe_Holo_Beacon",
+            "name": "Holo Beacon",
+            "ingredients": {
+                "Iron_Ingot": 3,
+                "Prism": 4,
+                "Plasma_Exciter": 2,
+                "Circuit_Board": 2
+            },
+            "produce": {
+                "Holo_Beacon": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Em_Rail_Ejector": {
+            "className": "Recipe_Em_Rail_Ejector",
+            "name": "EM-Rail Ejector",
+            "ingredients": {
+                "Gear": 20,
+                "Processor": 5,
+                "Steel": 20,
+                "Super_Magnetic_Ring": 10
+            },
+            "produce": {
+                "Em_Rail_Ejector": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Vertical_Launching_Silo": {
+            "className": "Recipe_Vertical_Launching_Silo",
+            "name": "Vertical Launching Silo",
+            "ingredients": {
+                "Frame_Material": 30,
+                "Graviton_Lens": 20,
+                "Quantum_Chip": 10,
+                "Titanium_Alloy": 80
+            },
+            "produce": {
+                "Vertical_Launching_Silo": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 30,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Gauss_Turret": {
+            "className": "Recipe_Df_Gauss_Turret",
+            "name": "Gauss Turret",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Gear": 8,
+                "Iron_Ingot": 8,
+                "Magnetic_Coil": 4
+            },
+            "produce": {
+                "Df_Gauss_Turret": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Missile_Turret": {
+            "className": "Recipe_Df_Missile_Turret",
+            "name": "Missile Turret",
+            "ingredients": {
+                "Circuit_Board": 12,
+                "Df_Engine": 6,
+                "Electric_Motor": 6,
+                "Steel": 8
+            },
+            "produce": {
+                "Df_Missile_Turret": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Implosion_Cannon": {
+            "className": "Recipe_Df_Implosion_Cannon",
+            "name": "Implosion Cannon",
+            "ingredients": {
+                "Circuit_Board": 10,
+                "Electric_Motor": 8,
+                "Steel": 10,
+                "Super_Magnetic_Ring": 2
+            },
+            "produce": {
+                "Df_Implosion_Cannon": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Laser_Turret": {
+            "className": "Recipe_Df_Laser_Turret",
+            "name": "Laser Turret",
+            "ingredients": {
+                "Circuit_Board": 6,
+                "Photon_Combiner": 9,
+                "Plasma_Exciter": 6,
+                "Steel": 9
+            },
+            "produce": {
+                "Df_Laser_Turret": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Plasma_Turret": {
+            "className": "Recipe_Df_Plasma_Turret",
+            "name": "Plasma Turret",
+            "ingredients": {
+                "Plasma_Exciter": 5,
+                "Processor": 5,
+                "Super_Magnetic_Ring": 10,
+                "Titanium_Alloy": 20,
+                "Titanium_Glass": 10
+            },
+            "produce": {
+                "Df_Plasma_Turret": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Plasma_Turret_Sr": {
+            "className": "Recipe_Df_Plasma_Turret_Sr",
+            "name": "SR Plasma Turret",
+            "ingredients": {
+                "Plasma_Exciter": 5,
+                "Processor": 5,
+                "Steel": 15,
+                "Super_Magnetic_Ring": 5
+            },
+            "produce": {
+                "Df_Plasma_Turret_Sr": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Battlefield_Analysis_Base": {
+            "className": "Recipe_Df_Battlefield_Analysis_Base",
+            "name": "Battlefield Analysis Base",
+            "ingredients": {
+                "Circuit_Board": 18,
+                "Df_Engine": 12,
+                "Microcrystalline_Component": 6,
+                "Steel": 12
+            },
+            "produce": {
+                "Df_Battlefield_Analysis_Base": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Jammer_Tower": {
+            "className": "Recipe_Df_Jammer_Tower",
+            "name": "Jammer Tower",
+            "ingredients": {
+                "Copper_Ingot": 12,
+                "Diamond": 6,
+                "Plasma_Exciter": 9,
+                "Processor": 3
+            },
+            "produce": {
+                "Df_Jammer_Tower": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Signal_Tower": {
+            "className": "Recipe_Df_Signal_Tower",
+            "name": "Signal Tower",
+            "ingredients": {
+                "Crystal_Silicon": 6,
+                "Steel": 12,
+                "Wireless_Power_Tower": 2
+            },
+            "produce": {
+                "Df_Signal_Tower": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Planetary_Shield_Generator": {
+            "className": "Recipe_Df_Planetary_Shield_Generator",
+            "name": "Planetary Shield Generator",
+            "ingredients": {
+                "Electromagnetic_Turbine": 20,
+                "Particle_Container": 5,
+                "Steel": 20,
+                "Super_Magnetic_Ring": 5
+            },
+            "produce": {
+                "Df_Planetary_Shield_Generator": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Iron_Ingot": {
+            "className": "Recipe_Iron_Ingot",
+            "name": "Iron Ingot",
+            "ingredients": {
+                "Iron_Ore": 1
+            },
+            "produce": {
+                "Iron_Ingot": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Copper_Ingot": {
+            "className": "Recipe_Copper_Ingot",
+            "name": "Copper Ingot",
+            "ingredients": {
+                "Copper_Ore": 1
+            },
+            "produce": {
+                "Copper_Ingot": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_High_Purity_Silicon": {
+            "className": "Recipe_High_Purity_Silicon",
+            "name": "High-purity Silicon",
+            "ingredients": {
+                "Silicon_Ore": 2
+            },
+            "produce": {
+                "High_Purity_Silicon": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Titanium_Ingot": {
+            "className": "Recipe_Titanium_Ingot",
+            "name": "Titanium Ingot",
+            "ingredients": {
+                "Titanium_Ore": 2
+            },
+            "produce": {
+                "Titanium_Ingot": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Stone_Brick": {
+            "className": "Recipe_Stone_Brick",
+            "name": "Stone Brick",
+            "ingredients": {
+                "Stone": 1
+            },
+            "produce": {
+                "Stone_Brick": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Energetic_Graphite": {
+            "className": "Recipe_Energetic_Graphite",
+            "name": "Energetic Graphite",
+            "ingredients": {
+                "Coal": 2
+            },
+            "produce": {
+                "Energetic_Graphite": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Plasma_Refining": {
+            "className": "Recipe_Plasma_Refining",
+            "name": "Plasma Refining",
+            "ingredients": {
+                "Crude_Oil": 2
+            },
+            "produce": {
+                "Hydrogen": 1,
+                "Refined_Oil": 2
+            },
+            "mProducedIn": [
+                "Oil_Refinery"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Graphene": {
+            "className": "Recipe_Graphene",
+            "name": "Graphene",
+            "ingredients": {
+                "Energetic_Graphite": 3,
+                "Sulfuric_Acid": 1
+            },
+            "produce": {
+                "Graphene": 2
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Plastic": {
+            "className": "Recipe_Plastic",
+            "name": "Plastic",
+            "ingredients": {
+                "Energetic_Graphite": 1,
+                "Refined_Oil": 2
+            },
+            "produce": {
+                "Plastic": 1
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Proliferator_1": {
+            "className": "Recipe_Proliferator_1",
+            "name": "Proliferator Mk.I",
+            "ingredients": {
+                "Coal": 1
+            },
+            "produce": {
+                "Proliferator_1": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 0.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Proliferator_2": {
+            "className": "Recipe_Proliferator_2",
+            "name": "Proliferator Mk.II",
+            "ingredients": {
+                "Diamond": 1,
+                "Proliferator_1": 2
+            },
+            "produce": {
+                "Proliferator_2": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Proliferator_3": {
+            "className": "Recipe_Proliferator_3",
+            "name": "Proliferator Mk.III",
+            "ingredients": {
+                "Carbon_Nanotube": 1,
+                "Proliferator_2": 2
+            },
+            "produce": {
+                "Proliferator_3": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Magnum_Ammo_Box": {
+            "className": "Recipe_Df_Magnum_Ammo_Box",
+            "name": "Magnum Ammo Box",
+            "ingredients": {
+                "Copper_Ingot": 3
+            },
+            "produce": {
+                "Df_Magnum_Ammo_Box": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Missile_Set": {
+            "className": "Recipe_Df_Missile_Set",
+            "name": "Missile Set",
+            "ingredients": {
+                "Circuit_Board": 3,
+                "Copper_Ingot": 6,
+                "Df_Combustible_Unit": 2,
+                "Df_Engine": 1
+            },
+            "produce": {
+                "Df_Missile_Set": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Coal_Vein": {
+            "className": "Recipe_Coal_Vein",
+            "name": "Coal Veins",
+            "ingredients": {},
+            "produce": {
+                "Coal": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Copper_Vein": {
+            "className": "Recipe_Copper_Vein",
+            "name": "Copper Veins",
+            "ingredients": {},
+            "produce": {
+                "Copper_Ore": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Critical_Photon": {
+            "className": "Recipe_Critical_Photon",
+            "name": "Critical Photon",
+            "ingredients": {},
+            "produce": {
+                "Critical_Photon": 6
+            },
+            "mProducedIn": [
+                "Ray_Receiver"
+            ],
+            "mManufactoringDuration": 60,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Crude_Oil_Seep": {
+            "className": "Recipe_Crude_Oil_Seep",
+            "name": "Crude Oil Seep",
+            "ingredients": {},
+            "produce": {
+                "Crude_Oil": 1
+            },
+            "mProducedIn": [
+                "Oil_Extractor"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Fire_Ice_Vein": {
+            "className": "Recipe_Fire_Ice_Vein",
+            "name": "Fire Ice Vein",
+            "ingredients": {},
+            "produce": {
+                "Fire_Ice": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Fractal_Silicon_Vein": {
+            "className": "Recipe_Fractal_Silicon_Vein",
+            "name": "Fractal Silicon Veins",
+            "ingredients": {},
+            "produce": {
+                "Fractal_Silicon": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Iron_Vein": {
+            "className": "Recipe_Iron_Vein",
+            "name": "Iron Veins",
+            "ingredients": {},
+            "produce": {
+                "Iron_Ore": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Kimberlite_Vein": {
+            "className": "Recipe_Kimberlite_Vein",
+            "name": "Kimberlite Veins",
+            "ingredients": {},
+            "produce": {
+                "Kimberlite_Ore": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Ocean": {
+            "className": "Recipe_Ocean",
+            "name": "Ocean",
+            "ingredients": {},
+            "produce": {
+                "Water": 1
+            },
+            "mProducedIn": [
+                "Water_Pump"
+            ],
+            "mManufactoringDuration": 1.2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Optical_Grating_Crystal_Vein": {
+            "className": "Recipe_Optical_Grating_Crystal_Vein",
+            "name": "Grating Crystal Vein",
+            "ingredients": {},
+            "produce": {
+                "Optical_Grating_Crystal": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Organic_Crystal_Vein": {
+            "className": "Recipe_Organic_Crystal_Vein",
+            "name": "Organic Crystal Veins",
+            "ingredients": {},
+            "produce": {
+                "Organic_Crystal": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Silicium_Vein": {
+            "className": "Recipe_Silicium_Vein",
+            "name": "Silicon Veins",
+            "ingredients": {},
+            "produce": {
+                "Silicon_Ore": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Spiniform_Stalagmite_Crystal_Vein": {
+            "className": "Recipe_Spiniform_Stalagmite_Crystal_Vein",
+            "name": "Stalagmite Crystal Vein",
+            "ingredients": {},
+            "produce": {
+                "Spiniform_Stalagmite_Crystal": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Stone_Vein": {
+            "className": "Recipe_Stone_Vein",
+            "name": "Stone Veins",
+            "ingredients": {},
+            "produce": {
+                "Stone": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sulphuric_Acid_Vein": {
+            "className": "Recipe_Sulphuric_Acid_Vein",
+            "name": "Sulphuric Acid Ocean",
+            "ingredients": {},
+            "produce": {
+                "Sulfuric_Acid": 1
+            },
+            "mProducedIn": [
+                "Water_Pump"
+            ],
+            "mManufactoringDuration": 1.2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Titanium_Vein": {
+            "className": "Recipe_Titanium_Vein",
+            "name": "Titanium Veins",
+            "ingredients": {},
+            "produce": {
+                "Titanium_Ore": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Unipolar_Magnet_Vein": {
+            "className": "Recipe_Unipolar_Magnet_Vein",
+            "name": "Unipolar Magnet Veins",
+            "ingredients": {},
+            "produce": {
+                "Unipolar_Magnet": 1
+            },
+            "mProducedIn": [
+                "Mining_Machine"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Magnet": {
+            "className": "Recipe_Magnet",
+            "name": "Magnet",
+            "ingredients": {
+                "Iron_Ore": 1
+            },
+            "produce": {
+                "Magnet": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 1.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Magnetic_Coil": {
+            "className": "Recipe_Magnetic_Coil",
+            "name": "Magnetic Coil",
+            "ingredients": {
+                "Copper_Ingot": 1,
+                "Magnet": 2
+            },
+            "produce": {
+                "Magnetic_Coil": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Crystal_Silicon": {
+            "className": "Recipe_Crystal_Silicon",
+            "name": "Crystal Silicon",
+            "ingredients": {
+                "High_Purity_Silicon": 1
+            },
+            "produce": {
+                "Crystal_Silicon": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Titanium_Alloy": {
+            "className": "Recipe_Titanium_Alloy",
+            "name": "Titanium Alloy",
+            "ingredients": {
+                "Steel": 4,
+                "Sulfuric_Acid": 8,
+                "Titanium_Ingot": 4
+            },
+            "produce": {
+                "Titanium_Alloy": 4
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 12,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Glass": {
+            "className": "Recipe_Glass",
+            "name": "Glass",
+            "ingredients": {
+                "Stone": 2
+            },
+            "produce": {
+                "Glass": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Diamond": {
+            "className": "Recipe_Diamond",
+            "name": "Diamond",
+            "ingredients": {
+                "Energetic_Graphite": 1
+            },
+            "produce": {
+                "Diamond": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_X-Ray_Alternative": {
+            "className": "Recipe_X-Ray_Alternative",
+            "name": "X-ray Cracking",
+            "ingredients": {
+                "Hydrogen": 2,
+                "Refined_Oil": 1
+            },
+            "produce": {
+                "Energetic_Graphite": 1,
+                "Hydrogen": 3
+            },
+            "mProducedIn": [
+                "Oil_Refinery"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Graphene_Advanced_Alternative": {
+            "className": "Recipe_Graphene_Advanced_Alternative",
+            "name": "Graphene (advanced)",
+            "ingredients": {
+                "Fire_Ice": 2
+            },
+            "produce": {
+                "Graphene": 2,
+                "Hydrogen": 1
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Organic_Crystal": {
+            "className": "Recipe_Organic_Crystal",
+            "name": "Organic Crystal",
+            "ingredients": {
+                "Plastic": 2,
+                "Refined_Oil": 1,
+                "Water": 1
+            },
+            "produce": {
+                "Organic_Crystal": 1
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Combustible_Unit": {
+            "className": "Recipe_Df_Combustible_Unit",
+            "name": "Combustible Unit",
+            "ingredients": {
+                "Coal": 3
+            },
+            "produce": {
+                "Df_Combustible_Unit": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Explosive_Unit": {
+            "className": "Recipe_Df_Explosive_Unit",
+            "name": "Explosive Unit",
+            "ingredients": {
+                "Df_Combustible_Unit": 2,
+                "Plastic": 2,
+                "Sulfuric_Acid": 1
+            },
+            "produce": {
+                "Df_Explosive_Unit": 2
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Crystal_Explosive_Unit": {
+            "className": "Recipe_Df_Crystal_Explosive_Unit",
+            "name": "Crystal Explosive Unit",
+            "ingredients": {
+                "Casimir_Crystal": 1,
+                "Crystal_Silicon": 8,
+                "Df_Explosive_Unit": 8
+            },
+            "produce": {
+                "Df_Crystal_Explosive_Unit": 8
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 24,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Titanium_Ammo_Box": {
+            "className": "Recipe_Df_Titanium_Ammo_Box",
+            "name": "Titanium Ammo Box",
+            "ingredients": {
+                "Df_Magnum_Ammo_Box": 1,
+                "Titanium_Ingot": 2
+            },
+            "produce": {
+                "Df_Titanium_Ammo_Box": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Supersonic_Missile_Set": {
+            "className": "Recipe_Df_Supersonic_Missile_Set",
+            "name": "Supersonic Missile Set",
+            "ingredients": {
+                "Df_Explosive_Unit": 4,
+                "Df_Missile_Set": 2,
+                "Processor": 4,
+                "Thruster": 2
+            },
+            "produce": {
+                "Df_Supersonic_Missile_Set": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Steel": {
+            "className": "Recipe_Steel",
+            "name": "Steel",
+            "ingredients": {
+                "Iron_Ingot": 3
+            },
+            "produce": {
+                "Steel": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Electric_Motor": {
+            "className": "Recipe_Electric_Motor",
+            "name": "Electric Motor",
+            "ingredients": {
+                "Gear": 1,
+                "Iron_Ingot": 2,
+                "Magnetic_Coil": 1
+            },
+            "produce": {
+                "Electric_Motor": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Crystal_Silicon_Advanced_Alternative": {
+            "className": "Recipe_Crystal_Silicon_Advanced_Alternative",
+            "name": "Crystal Silicon (advanced)",
+            "ingredients": {
+                "Fractal_Silicon": 1
+            },
+            "produce": {
+                "Crystal_Silicon": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Titanium_Glass": {
+            "className": "Recipe_Titanium_Glass",
+            "name": "Titanium Glass",
+            "ingredients": {
+                "Glass": 2,
+                "Titanium_Ingot": 2,
+                "Water": 2
+            },
+            "produce": {
+                "Titanium_Glass": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Prism": {
+            "className": "Recipe_Prism",
+            "name": "Prism",
+            "ingredients": {
+                "Glass": 3
+            },
+            "produce": {
+                "Prism": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Diamond_Advanced_Alternative": {
+            "className": "Recipe_Diamond_Advanced_Alternative",
+            "name": "Diamond (advanced)",
+            "ingredients": {
+                "Kimberlite_Ore": 1
+            },
+            "produce": {
+                "Diamond": 2
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 1.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Reforming_Refine": {
+            "className": "Recipe_Reforming_Refine",
+            "name": "Reformed Refinement",
+            "ingredients": {
+                "Coal": 1,
+                "Hydrogen": 1,
+                "Refined_Oil": 2
+            },
+            "produce": {
+                "Refined_Oil": 3
+            },
+            "mProducedIn": [
+                "Oil_Refinery"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Titanium_Crystal": {
+            "className": "Recipe_Titanium_Crystal",
+            "name": "Titanium Crystal",
+            "ingredients": {
+                "Organic_Crystal": 1,
+                "Titanium_Ingot": 3
+            },
+            "produce": {
+                "Titanium_Crystal": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Organic_Crystal_Original_Alternative": {
+            "className": "Recipe_Organic_Crystal_Original_Alternative",
+            "name": "Organic Crystal (original)",
+            "ingredients": {
+                "Log": 20,
+                "Plant_Fuel": 30,
+                "Water": 10
+            },
+            "produce": {
+                "Organic_Crystal": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Engine": {
+            "className": "Recipe_Df_Engine",
+            "name": "Engine",
+            "ingredients": {
+                "Copper_Ingot": 2,
+                "Magnetic_Coil": 1
+            },
+            "produce": {
+                "Df_Engine": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Thruster": {
+            "className": "Recipe_Thruster",
+            "name": " - Thruster",
+            "ingredients": {
+                "Copper_Ingot": 3,
+                "Steel": 2
+            },
+            "produce": {
+                "Thruster": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Reinforced_Thruster": {
+            "className": "Recipe_Reinforced_Thruster",
+            "name": "Reinforced Thruster",
+            "ingredients": {
+                "Electromagnetic_Turbine": 5,
+                "Titanium_Alloy": 5
+            },
+            "produce": {
+                "Reinforced_Thruster": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Superalloy_Ammo_Box": {
+            "className": "Recipe_Df_Superalloy_Ammo_Box",
+            "name": "Superalloy Ammo Box",
+            "ingredients": {
+                "Df_Titanium_Ammo_Box": 1,
+                "Titanium_Alloy": 1
+            },
+            "produce": {
+                "Df_Superalloy_Ammo_Box": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Gravity_Missile_Set": {
+            "className": "Recipe_Df_Gravity_Missile_Set",
+            "name": "Gravity Missile Set",
+            "ingredients": {
+                "Df_Crystal_Explosive_Unit": 6,
+                "Df_Supersonic_Missile_Set": 3,
+                "Strange_Matter": 3
+            },
+            "produce": {
+                "Df_Gravity_Missile_Set": 3
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Gear": {
+            "className": "Recipe_Gear",
+            "name": "Gear",
+            "ingredients": {
+                "Iron_Ingot": 1
+            },
+            "produce": {
+                "Gear": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Electromagnetic_Turbine": {
+            "className": "Recipe_Electromagnetic_Turbine",
+            "name": "Electromagnetic Turbine",
+            "ingredients": {
+                "Electric_Motor": 2,
+                "Magnetic_Coil": 2
+            },
+            "produce": {
+                "Electromagnetic_Turbine": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Silicon_Ore_Alternative": {
+            "className": "Recipe_Silicon_Ore_Alternative",
+            "name": "Silicon Ore",
+            "ingredients": {
+                "Stone": 10
+            },
+            "produce": {
+                "Silicon_Ore": 1
+            },
+            "mProducedIn": [
+                "Arc_Smelter",
+                "Plane_Smelter"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Circuit_Board": {
+            "className": "Recipe_Circuit_Board",
+            "name": "Circuit Board",
+            "ingredients": {
+                "Copper_Ingot": 1,
+                "Iron_Ingot": 2
+            },
+            "produce": {
+                "Circuit_Board": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Graviton_Lens": {
+            "className": "Recipe_Graviton_Lens",
+            "name": "Graviton Lens",
+            "ingredients": {
+                "Diamond": 4,
+                "Strange_Matter": 1
+            },
+            "produce": {
+                "Graviton_Lens": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Sulfuric_Acid": {
+            "className": "Recipe_Sulfuric_Acid",
+            "name": "Sulfuric Acid",
+            "ingredients": {
+                "Refined_Oil": 6,
+                "Stone": 8,
+                "Water": 4
+            },
+            "produce": {
+                "Sulfuric_Acid": 4
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Deuterium_Fractionation_Alternative": {
+            "className": "Recipe_Deuterium_Fractionation_Alternative",
+            "name": "Deuterium Fractionation",
+            "ingredients": {
+                "Hydrogen": 100
+            },
+            "produce": {
+                "Deuterium": 1
+            },
+            "mProducedIn": [
+                "Fractionator"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Carbon_Nanotube": {
+            "className": "Recipe_Carbon_Nanotube",
+            "name": "Carbon Nanotube",
+            "ingredients": {
+                "Graphene": 3,
+                "Titanium_Ingot": 1
+            },
+            "produce": {
+                "Carbon_Nanotube": 2
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Strange_Matter": {
+            "className": "Recipe_Strange_Matter",
+            "name": "Strange Matter",
+            "ingredients": {
+                "Deuterium": 10,
+                "Iron_Ingot": 2,
+                "Particle_Container": 2
+            },
+            "produce": {
+                "Strange_Matter": 1
+            },
+            "mProducedIn": [
+                "Miniature_Particle_Collider"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Logistics_Bot": {
+            "className": "Recipe_Logistics_Bot",
+            "name": "Logistics Bot",
+            "ingredients": {
+                "Df_Engine": 1,
+                "Iron_Ingot": 2,
+                "Processor": 1
+            },
+            "produce": {
+                "Logistics_Bot": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Logistics_Drone": {
+            "className": "Recipe_Logistics_Drone",
+            "name": "Logistics Drone",
+            "ingredients": {
+                "Iron_Ingot": 5,
+                "Processor": 2,
+                "Thruster": 2
+            },
+            "produce": {
+                "Logistics_Drone": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Logistics_Vessel": {
+            "className": "Recipe_Logistics_Vessel",
+            "name": "Interstellar Logistics Vessel",
+            "ingredients": {
+                "Processor": 10,
+                "Reinforced_Thruster": 2,
+                "Titanium_Alloy": 10
+            },
+            "produce": {
+                "Logistics_Vessel": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Plasma_Capsule": {
+            "className": "Recipe_Df_Plasma_Capsule",
+            "name": "Plasma Capsule",
+            "ingredients": {
+                "Deuterium": 10,
+                "Graphene": 1,
+                "Magnet": 2
+            },
+            "produce": {
+                "Df_Plasma_Capsule": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Shell_Set": {
+            "className": "Recipe_Df_Shell_Set",
+            "name": "Shell Set",
+            "ingredients": {
+                "Copper_Ingot": 9,
+                "Df_Combustible_Unit": 2
+            },
+            "produce": {
+                "Df_Shell_Set": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Plasma_Exciter": {
+            "className": "Recipe_Plasma_Exciter",
+            "name": "Plasma Exciter",
+            "ingredients": {
+                "Magnetic_Coil": 4,
+                "Prism": 2
+            },
+            "produce": {
+                "Plasma_Exciter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Super_Magnetic_Ring": {
+            "className": "Recipe_Super_Magnetic_Ring",
+            "name": "Super-magnetic Ring",
+            "ingredients": {
+                "Electromagnetic_Turbine": 2,
+                "Energetic_Graphite": 1,
+                "Magnet": 3
+            },
+            "produce": {
+                "Super_Magnetic_Ring": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Particle_Broadband": {
+            "className": "Recipe_Particle_Broadband",
+            "name": "Particle Broadband",
+            "ingredients": {
+                "Carbon_Nanotube": 2,
+                "Crystal_Silicon": 2,
+                "Plastic": 1
+            },
+            "produce": {
+                "Particle_Broadband": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Processor": {
+            "className": "Recipe_Processor",
+            "name": "Processor",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Microcrystalline_Component": 2
+            },
+            "produce": {
+                "Processor": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Casimir_Crystal": {
+            "className": "Recipe_Casimir_Crystal",
+            "name": "Casimir Crystal",
+            "ingredients": {
+                "Graphene": 2,
+                "Hydrogen": 12,
+                "Titanium_Crystal": 1
+            },
+            "produce": {
+                "Casimir_Crystal": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Particle_Container": {
+            "className": "Recipe_Particle_Container",
+            "name": "Particle Container",
+            "ingredients": {
+                "Copper_Ingot": 2,
+                "Electromagnetic_Turbine": 2,
+                "Graphene": 2
+            },
+            "produce": {
+                "Particle_Container": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Deuterium": {
+            "className": "Recipe_Deuterium",
+            "name": "Deuterium",
+            "ingredients": {
+                "Hydrogen": 10
+            },
+            "produce": {
+                "Deuterium": 5
+            },
+            "mProducedIn": [
+                "Miniature_Particle_Collider"
+            ],
+            "mManufactoringDuration": 2.5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Carbon_Nanotube_Advanced_Alternative": {
+            "className": "Recipe_Carbon_Nanotube_Advanced_Alternative",
+            "name": "Carbon Nanotube (advanced)",
+            "ingredients": {
+                "Spiniform_Stalagmite_Crystal": 6
+            },
+            "produce": {
+                "Carbon_Nanotube": 2
+            },
+            "mProducedIn": [
+                "Chemical_Plant"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Solar_Sail": {
+            "className": "Recipe_Solar_Sail",
+            "name": "Solar Sail",
+            "ingredients": {
+                "Graphene": 1,
+                "Photon_Combiner": 1
+            },
+            "produce": {
+                "Solar_Sail": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Frame_Material": {
+            "className": "Recipe_Frame_Material",
+            "name": "Frame Material",
+            "ingredients": {
+                "Carbon_Nanotube": 4,
+                "High_Purity_Silicon": 1,
+                "Titanium_Alloy": 1
+            },
+            "produce": {
+                "Frame_Material": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Dyson_Sphere_Component": {
+            "className": "Recipe_Dyson_Sphere_Component",
+            "name": "Dyson Sphere Component",
+            "ingredients": {
+                "Frame_Material": 3,
+                "Processor": 3,
+                "Solar_Sail": 3
+            },
+            "produce": {
+                "Dyson_Sphere_Component": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Small_Carrier_Rocket": {
+            "className": "Recipe_Small_Carrier_Rocket",
+            "name": "Small Carrier Rocket",
+            "ingredients": {
+                "Deuteron_Fuel_Rod": 4,
+                "Dyson_Sphere_Component": 2,
+                "Quantum_Chip": 2
+            },
+            "produce": {
+                "Small_Carrier_Rocket": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Antimatter_Capsule": {
+            "className": "Recipe_Df_Antimatter_Capsule",
+            "name": "Antimatter Capsule",
+            "ingredients": {
+                "Antimatter": 10,
+                "Df_Plasma_Capsule": 1,
+                "Hydrogen": 10,
+                "Particle_Container": 1
+            },
+            "produce": {
+                "Df_Antimatter_Capsule": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_High_Explosive_Shell_Set": {
+            "className": "Recipe_Df_High_Explosive_Shell_Set",
+            "name": "High-Explosive Shell Set",
+            "ingredients": {
+                "Df_Explosive_Unit": 2,
+                "Df_Shell_Set": 1,
+                "Titanium_Ingot": 6
+            },
+            "produce": {
+                "Df_High_Explosive_Shell_Set": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Photon_Combiner": {
+            "className": "Recipe_Photon_Combiner",
+            "name": "Photon Combiner",
+            "ingredients": {
+                "Circuit_Board": 1,
+                "Prism": 2
+            },
+            "produce": {
+                "Photon_Combiner": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Photon_Combiner_Advanced_Alternative": {
+            "className": "Recipe_Photon_Combiner_Advanced_Alternative",
+            "name": "Photon Combiner (advanced)",
+            "ingredients": {
+                "Circuit_Board": 1,
+                "Optical_Grating_Crystal": 1
+            },
+            "produce": {
+                "Photon_Combiner": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Microcrystalline_Component": {
+            "className": "Recipe_Microcrystalline_Component",
+            "name": "Microcrystalline Component",
+            "ingredients": {
+                "Copper_Ingot": 1,
+                "High_Purity_Silicon": 2
+            },
+            "produce": {
+                "Microcrystalline_Component": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Quantum_Chip": {
+            "className": "Recipe_Quantum_Chip",
+            "name": "Quantum Chip",
+            "ingredients": {
+                "Plane_Filter": 2,
+                "Processor": 2
+            },
+            "produce": {
+                "Quantum_Chip": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Casimir_Crystal_Advanced_Alternative": {
+            "className": "Recipe_Casimir_Crystal_Advanced_Alternative",
+            "name": "Casimir Crystal (advanced)",
+            "ingredients": {
+                "Graphene": 2,
+                "Hydrogen": 12,
+                "Optical_Grating_Crystal": 8
+            },
+            "produce": {
+                "Casimir_Crystal": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Particle_Container_Advanced_Alternative": {
+            "className": "Recipe_Particle_Container_Advanced_Alternative",
+            "name": "Particle Container (advanced)",
+            "ingredients": {
+                "Copper_Ingot": 2,
+                "Unipolar_Magnet": 10
+            },
+            "produce": {
+                "Particle_Container": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Plane_Filter": {
+            "className": "Recipe_Plane_Filter",
+            "name": "Plane Filter",
+            "ingredients": {
+                "Casimir_Crystal": 1,
+                "Titanium_Glass": 2
+            },
+            "produce": {
+                "Plane_Filter": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 12,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Annihilation_Constraint_Sphere": {
+            "className": "Recipe_Annihilation_Constraint_Sphere",
+            "name": "Annihilation Constraint Sphere",
+            "ingredients": {
+                "Particle_Container": 1,
+                "Processor": 1
+            },
+            "produce": {
+                "Annihilation_Constraint_Sphere": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 20,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Hydrogen_Fuel_Rod": {
+            "className": "Recipe_Hydrogen_Fuel_Rod",
+            "name": "Hydrogen Fuel Rod",
+            "ingredients": {
+                "Hydrogen": 10,
+                "Titanium_Ingot": 1
+            },
+            "produce": {
+                "Hydrogen_Fuel_Rod": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Deuteron_Fuel_Rod": {
+            "className": "Recipe_Deuteron_Fuel_Rod",
+            "name": "Deuteron Fuel Rod",
+            "ingredients": {
+                "Deuterium": 20,
+                "Super_Magnetic_Ring": 1,
+                "Titanium_Alloy": 1
+            },
+            "produce": {
+                "Deuteron_Fuel_Rod": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 12,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Antimatter_Fuel_Rod": {
+            "className": "Recipe_Antimatter_Fuel_Rod",
+            "name": "Antimatter Fuel Rod",
+            "ingredients": {
+                "Annihilation_Constraint_Sphere": 1,
+                "Antimatter": 12,
+                "Hydrogen": 12,
+                "Titanium_Alloy": 1
+            },
+            "produce": {
+                "Antimatter_Fuel_Rod": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 24,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Strange_Annihilation_Fuel_Rod": {
+            "className": "Recipe_Df_Strange_Annihilation_Fuel_Rod",
+            "name": "Strange Annihilation Fuel Rod",
+            "ingredients": {
+                "Antimatter_Fuel_Rod": 8,
+                "Df_Core_Element": 1,
+                "Frame_Material": 1,
+                "Strange_Matter": 2
+            },
+            "produce": {
+                "Df_Strange_Annihilation_Fuel_Rod": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 32,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Jamming_Capsule": {
+            "className": "Recipe_Df_Jamming_Capsule",
+            "name": "Jamming Capsule",
+            "ingredients": {
+                "Electromagnetic_Turbine": 1,
+                "Hydrogen": 3,
+                "Plasma_Exciter": 1
+            },
+            "produce": {
+                "Df_Jamming_Capsule": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Crystal_Shell_Set": {
+            "className": "Recipe_Df_Crystal_Shell_Set",
+            "name": "Crystal Shell Set",
+            "ingredients": {
+                "Df_Crystal_Explosive_Unit": 2,
+                "Df_High_Explosive_Shell_Set": 1,
+                "Titanium_Alloy": 3
+            },
+            "produce": {
+                "Df_Crystal_Shell_Set": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Prototype": {
+            "className": "Recipe_Df_Prototype",
+            "name": "Prototype",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Df_Engine": 1,
+                "Iron_Ingot": 3,
+                "Plasma_Exciter": 1
+            },
+            "produce": {
+                "Df_Prototype": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Precision_Drone": {
+            "className": "Recipe_Df_Precision_Drone",
+            "name": "Precision Drone",
+            "ingredients": {
+                "Circuit_Board": 2,
+                "Df_Prototype": 1,
+                "Electromagnetic_Turbine": 1,
+                "Photon_Combiner": 2
+            },
+            "produce": {
+                "Df_Precision_Drone": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Attack_Drone": {
+            "className": "Recipe_Df_Attack_Drone",
+            "name": "Attack Drone",
+            "ingredients": {
+                "Df_Prototype": 1,
+                "Electromagnetic_Turbine": 1,
+                "Particle_Container": 1,
+                "Processor": 1
+            },
+            "produce": {
+                "Df_Attack_Drone": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 4,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Corvette": {
+            "className": "Recipe_Df_Corvette",
+            "name": "Corvette",
+            "ingredients": {
+                "Particle_Container": 3,
+                "Processor": 2,
+                "Reinforced_Thruster": 1,
+                "Titanium_Alloy": 5
+            },
+            "produce": {
+                "Df_Corvette": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 5,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Destroyer": {
+            "className": "Recipe_Df_Destroyer",
+            "name": "Destroyer",
+            "ingredients": {
+                "Frame_Material": 20,
+                "Processor": 4,
+                "Reinforced_Thruster": 4,
+                "Strange_Matter": 1
+            },
+            "produce": {
+                "Df_Destroyer": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Space_Warper": {
+            "className": "Recipe_Space_Warper",
+            "name": "Space Warper",
+            "ingredients": {
+                "Graviton_Lens": 1
+            },
+            "produce": {
+                "Space_Warper": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Space_Warper_Advanced": {
+            "className": "Recipe_Space_Warper_Advanced",
+            "name": "Space Warper (advanced)",
+            "ingredients": {
+                "Gravity_Matrix": 1
+            },
+            "produce": {
+                "Space_Warper": 8
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Mass_Energy_Storage": {
+            "className": "Recipe_Mass_Energy_Storage",
+            "name": "Mass-energy Storage",
+            "ingredients": {
+                "Critical_Photon": 2
+            },
+            "produce": {
+                "Antimatter": 2,
+                "Hydrogen": 2
+            },
+            "mProducedIn": [
+                "Miniature_Particle_Collider"
+            ],
+            "mManufactoringDuration": 2,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Df_Suppressing_Capsule": {
+            "className": "Recipe_Df_Suppressing_Capsule",
+            "name": "Suppressing Capsule",
+            "ingredients": {
+                "Df_Jamming_Capsule": 2,
+                "Super_Magnetic_Ring": 1,
+                "Titanium_Glass": 2
+            },
+            "produce": {
+                "Df_Suppressing_Capsule": 2
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Foundation": {
+            "className": "Recipe_Foundation",
+            "name": "Foundation",
+            "ingredients": {
+                "Steel": 1,
+                "Stone_Brick": 3
+            },
+            "produce": {
+                "Foundation": 1
+            },
+            "mProducedIn": [
+                "Assembling_Machine_Mk1",
+                "Assembling_Machine_Mk2",
+                "Assembling_Machine_Mk3"
+            ],
+            "mManufactoringDuration": 1,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Electromagnetic_Matrix": {
+            "className": "Recipe_Electromagnetic_Matrix",
+            "name": "Electromagnetic Matrix",
+            "ingredients": {
+                "Circuit_Board": 1,
+                "Magnetic_Coil": 1
+            },
+            "produce": {
+                "Electromagnetic_Matrix": 1
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 3,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Energy_Matrix": {
+            "className": "Recipe_Energy_Matrix",
+            "name": "Energy Matrix",
+            "ingredients": {
+                "Energetic_Graphite": 2,
+                "Hydrogen": 2
+            },
+            "produce": {
+                "Energy_Matrix": 1
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 6,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Structure_Matrix": {
+            "className": "Recipe_Structure_Matrix",
+            "name": "Structure Matrix",
+            "ingredients": {
+                "Diamond": 1,
+                "Titanium_Crystal": 1
+            },
+            "produce": {
+                "Structure_Matrix": 1
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 8,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Information_Matrix": {
+            "className": "Recipe_Information_Matrix",
+            "name": "Information Matrix",
+            "ingredients": {
+                "Particle_Broadband": 1,
+                "Processor": 2
+            },
+            "produce": {
+                "Information_Matrix": 1
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 10,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Gravity_Matrix": {
+            "className": "Recipe_Gravity_Matrix",
+            "name": "Gravity Matrix",
+            "ingredients": {
+                "Graviton_Lens": 1,
+                "Quantum_Chip": 1
+            },
+            "produce": {
+                "Gravity_Matrix": 2
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 24,
+            "mManualManufacturingMultiplier": 1
+        },
+        "Recipe_Universe_Matrix": {
+            "className": "Recipe_Universe_Matrix",
+            "name": "Universe Matrix",
+            "ingredients": {
+                "Antimatter": 1,
+                "Electromagnetic_Matrix": 1,
+                "Energy_Matrix": 1,
+                "Gravity_Matrix": 1,
+                "Information_Matrix": 1,
+                "Structure_Matrix": 1
+            },
+            "produce": {
+                "Universe_Matrix": 1
+            },
+            "mProducedIn": [
+                "Matrix_Lab"
+            ],
+            "mManufactoringDuration": 15,
+            "mManualManufacturingMultiplier": 1
+        }
+    }
+}

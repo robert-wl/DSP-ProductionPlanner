@@ -8,53 +8,89 @@ A game from Youthcat Studio.
 
 [![DSPCPP](./img/readmeImage.jpg)](https://dyson-calculator.com/en/production-planner)
 
-This repository is the planner as a standalone [Next.js](https://nextjs.org) app
-that deploys to Vercel as-is. Upstream it was only the calculation bundle:
+This repository is the planner as a standalone [Vite](https://vite.dev) app that
+builds to plain static files. Upstream it was only the calculation bundle:
 `webpack` built a single script that dyson-calculator.com loaded into a page it
 rendered itself, so there was nothing here to deploy — no HTML, no entry point,
-and the markup that script drove lived in that site. The app in `app/` supplies
-that missing half, and the embed bundle is gone: this repo builds one thing.
+and the markup that script drove lived in that site. `index.html` + `src/main.jsx`
+supply that missing half, and the embed bundle is gone: this repo builds one thing.
 
-## Deploying to Vercel
+There is no server. The game data is generated at build time, the icons are
+files on disk, and the calculation runs in the visitor's browser in a real
+WebWorker.
 
-1. Import the repository on Vercel. The Next.js preset is detected — no build
-   settings to change.
-2. Deploy.
+## Deploying
 
-Nothing else is required: there is no database, no server state, and the whole
-calculation runs in the visitor's browser.
+`npm run build` writes `dist/`. Any static host serves it, as long as unknown
+paths fall back to `index.html` — share links live under `/json/<payload>`.
+`vercel.json` sets that rewrite up for Vercel, where the Vite preset is detected
+with no build settings to change.
 
 ## Game data
 
-The planner runs on a buildings / items / recipes table. A snapshot of the real
-one (`Stable` branch: 45 buildings, 74 items, 130 recipes) is bundled at
-`lib/gameData.json`, so a fresh deploy works with no configuration.
+The planner runs on a buildings / items / recipes table keyed by class name,
+which `src/Worker.js` has expected since it lived on dyson-calculator.com. That
+table is generated, not hand-maintained:
 
-`app/api/game/route.js` serves it. It goes through a route handler rather than
-being imported into the page so the ~100KB of JSON is fetched once and cached,
-instead of riding along in the client bundle on every load.
+```
+vendor/factoriolab/{data.json,defaults.json,icons.webp}   MIT, pinned commit
+        │
+        │  npm run build-data       (scripts/buildGameData.mjs)
+        ▼
+public/data/game.json      63 buildings, 111 items, 180 recipes, DSP 0.10.29.21950
+public/icons/<id>.webp     174 icons, sliced out of the sprite sheet
+```
 
-| Variable | Default | Meaning |
+Both outputs are checked in, so a clone builds without running the generator.
+Refreshing the data is a `curl` and a `npm run build-data` — see
+[vendor/factoriolab/SOURCE.md](vendor/factoriolab/SOURCE.md).
+
+### What the generator has to reconcile
+
+FactorioLab's schema and the worker's are not the same shape, and the worker is
+pinned byte for byte by the test suite, so the adapter absorbs every difference:
+
+| concept | `src/Worker.js` | FactorioLab |
 | --- | --- | --- |
-| `ASSET_BASE_URL` | `https://www.dyson-calculator.com` | Origin for item and building artwork. The data stores these as site-relative paths (`/img/gameUI/iron-ore.png`), which the upstream page could use as-is because it was served from that origin; here they need one. Icons that fail to load fall back to a placeholder. |
-| `GAME_DATA_URL` | *(unset)* | Optional. Set it to fetch a newer table from the upstream API instead of the bundled one; `{lang}` is replaced with the requested language. If the fetch fails the bundled copy still answers, and the page says so. |
+| shape | objects keyed by class name | flat arrays with `id` |
+| recipe inputs / outputs | `ingredients` / `produce` | `in` / `out` |
+| producer | `mProducedIn` | `producers` |
+| machine stats | fields on the building | `item.machine.{usage,drain,speed}` |
+| icon | `image`, a URL | a sprite offset `{x,y}` |
+| alternative recipes | `_Alternative` in the class name | `defaults.excludedRecipes` |
 
-To refresh the bundled data, replace `lib/gameData.json` with a new response,
-keeping `buildingsData`, `itemsData` and `recipesData` (the `technologiesData`
-and `upgradesData` the endpoint also returns are unused, and are half its size).
+Judgement calls it makes, all near the top of `scripts/buildGameData.mjs` and
+all reversible there:
 
-If you point `GAME_DATA_URL` somewhere, point it at an origin you trust:
-`src/Worker.js` interpolates item names and URLs straight into the HTML it
-generates, exactly as it did upstream, so a hostile feed could inject markup
-into the results panels.
+- **Technologies and upgrades are dropped.** 312 of the 486 upstream items;
+  nothing reads them.
+- **Newer machine tiers are held back from `mProducedIn`.** The worker picks the
+  *last* producer listed, so a Re-composing Assembler or a Quantum Chemical Plant
+  would silently become the default with no UI to choose otherwise. They are
+  still in the table as buildable items.
+- **Orbital collector recipes are dropped.** They are map-capped pseudo-recipes,
+  not something you build.
+- **Deuterium fractionation keeps its 100:1 ratio.** Upstream states it as
+  0.01 in / 0.01 out, which only means anything inside FactorioLab's own belt
+  model; taken literally it turns hydrogen into deuterium one for one.
+- **Mining machines are assumed to cover 6 veins**, which is not in the upstream
+  data and was baked into the old table too.
+
+The generator prints what it dropped and why on every run.
+
+Icons are sliced into one file each rather than inlined as data URIs: the worker
+builds HTML strings with `<img src="{item.image}">`, so a data URI would
+duplicate the bytes into every node of the tree. 174 icons come to ~700 KB, less
+than the 850 KB sprite they came from, and each one caches on its own.
 
 ## Running locally
 
 ```
 npm install
-npm run dev          # http://localhost:3000
-npm run build        # production build
-npm start            # serve the production build
+npm run dev          # http://localhost:5173
+npm run build        # production build into dist/
+npm run preview      # serve that build
+npm run build-data   # regenerate public/data and public/icons
 ```
 
 ## How it fits together
@@ -62,23 +98,41 @@ npm start            # serve the production build
 | Path | What it is |
 | --- | --- |
 | `src/Worker.js` | The planner itself, untouched. It is one self-contained function so it can be stringified into a Blob and run as a real WebWorker. |
+| `src/main.jsx` | Entry point, and the whole router: `/` and `/json/<payload>`. |
 | `lib/plannerWorker.js` | Starts that worker and relays its messages. |
 | `lib/plannerState.js` | The planner's inputs, and their two shapes: the `formData` the worker expects, and the `/json/<payload>` share URL. |
 | `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's templates. |
 | `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet the upstream page used. |
-| `lib/gameData.json` | The bundled buildings / items / recipes table. |
-| `app/api/game/route.js` | Serves that table, resolving relative asset paths against `ASSET_BASE_URL`. |
+| `scripts/buildGameData.mjs` | The FactorioLab → worker schema adapter, and the sprite slicer. |
+| `public/data/game.json`, `public/icons/` | Its output, fetched by the page at runtime. |
 
 Share URLs keep the upstream `/json/<url-encoded JSON>` shape, so links made by
 the original planner open here unchanged.
 
+`src/Worker.js` interpolates item names and URLs straight into the HTML it
+generates, exactly as it did upstream. That is safe because the table is
+generated here from a pinned source; it would not be safe against an arbitrary
+feed, which is one reason there is no longer an option to point it at one.
+
 ## Tests
 
 `npm test` runs the differential and unit suites over `src/Worker.js` — see
-[test/README.md](test/README.md). The calculation is untouched by this
-conversion, and those tests are what pins it that way.
+[test/README.md](test/README.md). They diff the current worker against the
+reference implementation over fixtures of their own, so they are independent of
+whatever dataset ships: the calculation is untouched by this conversion, and
+those tests are what pins it that way.
+
+## Attribution
+
+Game data and icons come from [FactorioLab](https://github.com/factoriolab/factoriolab)
+(MIT); the art is Youthcat Studio's. See [THIRD-PARTY.md](THIRD-PARTY.md).
 
 <!-- ROADMAP -->
 ## Roadmap
+
+Proliferator, sorter counts, belt stacking, idle drain and the Dark Fog machines
+are all carried in the upstream data (`flags: [beltStack, inactiveDrain,
+miningSpeed, power, proliferator]`) and modelled by none of `src/Worker.js` yet.
+The adapter is the prerequisite for all of them.
 
 See the [open issues](https://github.com/AnthorNet/DSP-ProductionPlanner/issues) for a list of proposed features (and known issues).
