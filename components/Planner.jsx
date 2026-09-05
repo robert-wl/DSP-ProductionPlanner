@@ -9,6 +9,7 @@ import {
     DIRECTIONS,
     SMELTER_SPEEDS,
     buildFormData,
+    pickableItems,
     recipesForState,
     shareUrlFor,
     stateFromPayload
@@ -79,7 +80,7 @@ export default function Planner({initialPayload})
                 // Drop anything in a shared URL this dataset does not know.
                 if(initialPayload !== null && initialPayload !== undefined)
                 {
-                    setState(stateFromPayload(initialPayload, data.itemsData));
+                    setState(stateFromPayload(initialPayload, pickableItems(data)));
                 }
             })
             .catch(function(error){
@@ -320,7 +321,7 @@ export default function Planner({initialPayload})
     }
 
     // Derived ---------------------------------------------------------------
-    let items = gameData === null ? {} : gameData.itemsData;
+    let items = useMemo(function(){ return pickableItems(gameData); }, [gameData]);
 
     let altRecipes = useMemo(function(){
         if(gameData === null)
