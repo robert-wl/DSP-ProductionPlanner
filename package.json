@@ -1,21 +1,30 @@
 {
-    "name": "DSPCPP-build",
+    "name": "dsp-production-planner",
     "author": "AnthorNet",
-    "description": "DSPCPP webpack builder.",
-    "version": "1.0.0",
+    "description": "Dyson Sphere Program production planner, deployable as a Next.js app.",
+    "version": "2.0.0",
     "private": true,
-    "devDependencies": {
-        "@sentry/webpack-plugin": "^1.13.0",
-        "terser-webpack-plugin": "^5.0.3",
-        "webpack": "^5.6.0",
-        "webpack-cli": "^4.2.0"
-    },
     "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
         "build-SCIM": "webpack",
         "test": "node --test \"test/*.test.js\"",
         "benchmark": "node test/benchmark.js"
     },
-    "main": "webpack.config.js",
+    "dependencies": {
+        "cytoscape": "^3.30.2",
+        "cytoscape-elk": "^2.2.0",
+        "elkjs": "^0.9.3",
+        "next": "^15.5.4",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1"
+    },
+    "devDependencies": {
+        "terser-webpack-plugin": "^5.0.3",
+        "webpack": "^5.6.0",
+        "webpack-cli": "^4.2.0"
+    },
     "keywords": [],
     "license": "ISC"
 }

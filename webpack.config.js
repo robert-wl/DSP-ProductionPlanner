@@ -1,12 +1,17 @@
 'use strict';
 
-const webpack                       = require('webpack');
+/**
+ * Legacy build: bundles src/DSPCPP.js into build/DSPCPP.js, the script the
+ * upstream dyson-calculator.com page loads. The Next.js app in app/ does not
+ * use this - it drives src/Worker.js directly - but the bundle is kept so the
+ * original embed target still builds.
+ */
+
 const path                          = require('path');
 
-const SentryWebpackPlugin           = require('@sentry/webpack-plugin');
 const TerserPlugin                  = require("terser-webpack-plugin");
 
-module.exports = env => {
+module.exports = () => {
     return {
         mode            : 'production',
         devtool         : 'hidden-source-map',
@@ -25,22 +30,6 @@ module.exports = env => {
             minimizer       : [
                 //new TerserPlugin({test: /\.js(\?.*)?$/i})
             ]
-        },
-
-        plugins: [
-            // Send new release to Sentry
-            new SentryWebpackPlugin({
-                // sentry-cli configuration
-                url: env.SENTRY_URL,
-                authToken: env.SENTRY_AUTH_TOKEN,
-                org: "sentry",
-                project: "dyson-calculator",
-
-                // webpack specific configuration
-                validate: true,
-                include: path.resolve(__dirname, 'build'),
-                ignore: ['node_modules', 'webpack.config.js']
-            })
-        ]
+        }
     };
 };
