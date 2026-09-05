@@ -1,6 +1,6 @@
 {
     "name": "dsp-production-planner",
-    "author": "AnthorNet",
+    "author": "robert-wl",
     "description": "Dyson Sphere Program production planner, deployable as a static Vite app.",
     "version": "2.0.0",
     "private": true,

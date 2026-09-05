@@ -37,4 +37,8 @@ Gamera Games, on the same footing as every other DSP planner.
 ## Planner
 
 `src/Worker.js` and the planner UI descend from AnthorNet's
-[DSP-ProductionPlanner](https://github.com/AnthorNet/DSP-ProductionPlanner) (ISC).
+[DSP-ProductionPlanner](https://github.com/AnthorNet/DSP-ProductionPlanner),
+which declares ISC in its `package.json` and ships no LICENSE file of its own,
+so there is no upstream copyright notice to reproduce here. This repository
+does not replay that project's commits - it starts at the Vite conversion - so
+this notice and the README are where the lineage is recorded.

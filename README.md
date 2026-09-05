@@ -6,8 +6,6 @@
 The production planner is able to produce factory chains for Dyson Sphere Program.
 A game from Youthcat Studio.
 
-[![DSPCPP](./img/readmeImage.jpg)](https://dyson-calculator.com/en/production-planner)
-
 This repository is the planner as a standalone [Vite](https://vite.dev) app that
 builds to plain static files. Upstream it was only the calculation bundle:
 `webpack` built a single script that dyson-calculator.com loaded into a page it
@@ -18,6 +16,18 @@ supply that missing half, and the embed bundle is gone: this repo builds one thi
 There is no server. The game data is generated at build time, the icons are
 files on disk, and the calculation runs in the visitor's browser in a real
 WebWorker.
+
+## Reference repositories
+
+Two projects this one is built out of. Neither is vendored wholesale and
+neither shares this repository's git history, so they are named here instead:
+
+| Repository | License | What this repo takes from it |
+| --- | --- | --- |
+| [AnthorNet/DSP-ProductionPlanner](https://github.com/AnthorNet/DSP-ProductionPlanner) | ISC | The planner itself. `src/Worker.js` is that project's calculation, unchanged, and the UI in `components/` is a React rebuild of the page dyson-calculator.com rendered around it. |
+| [factoriolab/factoriolab](https://github.com/factoriolab/factoriolab) | MIT | The Dyson Sphere Program dataset and icon sprite in `vendor/factoriolab/`, pinned to one commit, from which `public/data/game.json` and `public/icons/` are generated. |
+
+Full notices, including the game art, are in [THIRD-PARTY.md](THIRD-PARTY.md).
 
 ## Deploying
 
@@ -131,7 +141,8 @@ those tests are what pins it that way.
 
 ## Attribution
 
-Game data and icons come from [FactorioLab](https://github.com/factoriolab/factoriolab)
+The planner comes from [AnthorNet/DSP-ProductionPlanner](https://github.com/AnthorNet/DSP-ProductionPlanner)
+(ISC); the game data and icons come from [FactorioLab](https://github.com/factoriolab/factoriolab)
 (MIT); the art is Youthcat Studio's. See [THIRD-PARTY.md](THIRD-PARTY.md).
 
 <!-- ROADMAP -->
@@ -142,4 +153,4 @@ are all carried in the upstream data (`flags: [beltStack, inactiveDrain,
 miningSpeed, power, proliferator]`) and modelled by none of `src/Worker.js` yet.
 The adapter is the prerequisite for all of them.
 
-See the [open issues](https://github.com/AnthorNet/DSP-ProductionPlanner/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/robert-wl/DSP-ProductionPlanner/issues) for a list of proposed features (and known issues).
