@@ -199,6 +199,29 @@ export default function Planner({initialPayload})
         };
     }, []);
 
+    // Item art is loaded from the upstream site (ASSET_BASE_URL). If a URL does
+    // not resolve, swap in the placeholder rather than leaving a broken-image
+    // glyph. Images arrive inside worker-generated HTML, so this listens on the
+    // capture phase - "error" does not bubble.
+    useEffect(function(){
+        function onError(event)
+        {
+            let image = event.target;
+
+                if(image.tagName !== 'IMG' || image.dataset.fallbackApplied === 'true')
+                {
+                    return;
+                }
+
+                image.dataset.fallbackApplied = 'true';
+                image.src = '/api/icon';
+        }
+
+        document.addEventListener('error', onError, true);
+
+        return function(){ document.removeEventListener('error', onError, true); };
+    }, []);
+
     // The tree's building rows collapse their sub-tree on click, which the
     // upstream page wired up with jQuery after every render.
     useEffect(function(){
@@ -336,6 +359,27 @@ export default function Planner({initialPayload})
         return recipes.sort(function(a, b){ return a.name.localeCompare(b.name); });
     }, [gameData]);
 
+    let beltOptions = useMemo(function(){
+        if(gameData === null)
+        {
+            return [];
+        }
+
+        let belts = [];
+
+        for(let buildingId in gameData.buildingsData)
+        {
+            let building = gameData.buildingsData[buildingId];
+
+                if(typeof building.beltSpeed === 'number')
+                {
+                    belts.push({value: String(building.beltSpeed), label: building.name + ' (' + building.beltSpeed + '/s)'});
+                }
+        }
+
+        return belts.sort(function(a, b){ return Number(a.value) - Number(b.value); });
+    }, [gameData]);
+
     let isSimple    = state.view === 'SIMPLE';
     let outputIds   = Object.keys(state.outputs);
     let inputIds    = Object.keys(state.inputs);
@@ -378,12 +422,10 @@ export default function Planner({initialPayload})
                 </div>
             </header>
 
-            {gameData.source === 'sample' && (
+            {gameData.source === 'bundled' && gameData.note && (
                 <div className="notice warning">
-                    <strong>Showing the bundled sample dataset.</strong>{' '}
-                    The live game data at <code>{gameData.upstream}</code> could not be reached
-                    {gameData.error ? ' (' + gameData.error + ')' : ''}. Point <code>GAME_DATA_URL</code> at a
-                    reachable endpoint to plan with the real recipe table.
+                    <strong>Using the bundled game data.</strong>{' '}
+                    {gameData.note}
                 </div>
             )}
 
@@ -491,14 +533,23 @@ export default function Planner({initialPayload})
                                 </label>
 
                                 <label className="field">
-                                    <span>Max belt speed (items/s)</span>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        step="1"
-                                        value={state.maxBeltSpeed}
-                                        onChange={function(event){ updateOption('maxBeltSpeed', event.target.value); }}
-                                    />
+                                    <span>Belt</span>
+                                    {beltOptions.length > 0
+                                        ? <select value={state.maxBeltSpeed} onChange={function(event){ updateOption('maxBeltSpeed', event.target.value); }}>
+                                            {beltOptions.some(function(belt){ return belt.value === state.maxBeltSpeed; }) === false && (
+                                                <option value={state.maxBeltSpeed}>{state.maxBeltSpeed}/s</option>
+                                            )}
+                                            {beltOptions.map(function(belt){
+                                                return <option key={belt.value} value={belt.value}>{belt.label}</option>;
+                                            })}
+                                          </select>
+                                        : <input
+                                            type="number"
+                                            min="1"
+                                            step="1"
+                                            value={state.maxBeltSpeed}
+                                            onChange={function(event){ updateOption('maxBeltSpeed', event.target.value); }}
+                                          />}
                                 </label>
 
                                 <label className="field">

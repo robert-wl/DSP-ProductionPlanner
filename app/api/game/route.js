@@ -1,26 +1,28 @@
-import {sampleGameData} from '../../../lib/sampleGameData.js';
+import gameData from '../../../lib/gameData.json';
 
 /**
  * Serves the buildings / items / recipes tables the planner runs on.
  *
- * The upstream page fetched these straight from its own site, which only
- * works from a page served by that same origin. Going through a route handler
- * instead keeps the browser same-origin, lets the response be cached, and
- * makes the upstream configurable per deployment.
+ * The data is bundled (lib/gameData.json), so the app has no runtime
+ * dependency on anything external and works on a fresh deploy with no
+ * configuration. Set GAME_DATA_URL to pull a newer table from the upstream API
+ * instead; if that fetch fails the bundled copy still answers.
  *
- * Set GAME_DATA_URL to the endpoint returning {buildingsData, itemsData,
- * recipesData}. "{lang}" in it is replaced with the requested language.
+ * It is served from a route handler rather than imported into the page so the
+ * ~100KB of JSON is fetched once and cached, instead of riding along in the
+ * client bundle on every load.
  */
 
-const DEFAULT_GAME_DATA_URL = 'https://dyson-calculator.com/{lang}/api/game';
+// Item and building "image"/"url" come back as site-relative paths
+// ("/img/gameUI/iron-ore.png"), which the upstream page could use directly
+// because it was served from that same origin. Here they need an origin.
+const DEFAULT_ASSET_BASE_URL = 'https://www.dyson-calculator.com';
 
-// Long enough that a burst of planner runs hits one upstream request, short
-// enough that a game update lands the same day.
 const CACHE_SECONDS = 3600;
 
-function upstreamFor(language)
+function assetBase()
 {
-    return (process.env.GAME_DATA_URL || DEFAULT_GAME_DATA_URL).replace(/\{lang\}/g, language);
+    return (process.env.ASSET_BASE_URL || DEFAULT_ASSET_BASE_URL).replace(/\/+$/, '');
 }
 
 function isUsable(data)
@@ -33,21 +35,63 @@ function isUsable(data)
 }
 
 /**
- * The one normalization the upstream page applied before handing the tables to
- * the worker. The worker only reads a recipe's className to sort "_Alternative"
- * recipes last, so this is cosmetic - but it is kept so a payload rendered
- * here matches one rendered by the original planner.
+ * Resolves the site-relative paths against the asset origin. Anything already
+ * absolute (or a data: URI) is left alone, so a feed that returns full URLs
+ * keeps working.
  */
-function normalize(data)
+function resolveAssets(table, base)
 {
-    for(let recipeId in data.recipesData)
+    for(let key in table)
     {
-        let recipe = data.recipesData[recipeId];
+        let entry = table[key];
 
-            if(recipe.className !== undefined && recipe.className.startsWith('/Game/FactoryGame/') === false)
-            {
-                recipe.className = '/Game/FactoryGame/Recipes/' + recipe.className;
-            }
+        for(let field of ['image', 'url'])
+        {
+            let value = entry[field];
+
+                if(typeof value === 'string' && value.startsWith('/') === true && value.startsWith('//') === false)
+                {
+                    entry[field] = base + value;
+                }
+        }
+    }
+
+    return table;
+}
+
+function payloadFrom(data, source, note)
+{
+    let base = assetBase();
+
+    return {
+        source          : source,
+        note            : note,
+        branch          : data.branch,
+        assetBaseUrl    : base,
+        buildingsData   : resolveAssets(data.buildingsData, base),
+        itemsData       : resolveAssets(data.itemsData, base),
+        recipesData     : data.recipesData
+    };
+}
+
+async function fetchUpstream(url)
+{
+    let response = await fetch(url, {
+        headers : {accept: 'application/json'},
+        signal  : AbortSignal.timeout(15000),
+        next    : {revalidate: CACHE_SECONDS}
+    });
+
+    if(response.ok === false)
+    {
+        throw new Error('upstream responded ' + response.status);
+    }
+
+    let data = await response.json();
+
+    if(isUsable(data) === false)
+    {
+        throw new Error('upstream payload is missing itemsData / recipesData / buildingsData');
     }
 
     return data;
@@ -56,67 +100,34 @@ function normalize(data)
 export async function GET(request)
 {
     let language = new URL(request.url).searchParams.get('lang') || 'en';
-        // Path segment of an upstream URL: keep it to a plain language code.
+        // Goes into an upstream URL path: keep it to a plain language code.
         if(/^[a-z]{2}(-[A-Za-z]{2})?$/.test(language) === false)
         {
             language = 'en';
         }
 
-    let url     = upstreamFor(language);
-    let failure = null;
+    let upstream = process.env.GAME_DATA_URL;
+    let headers  = {'cache-control': 'public, s-maxage=' + CACHE_SECONDS + ', stale-while-revalidate=86400'};
 
-    try
+    if(upstream !== undefined && upstream !== '')
     {
-        let response = await fetch(url, {
-            headers : {accept: 'application/json'},
-            signal  : AbortSignal.timeout(15000),
-            next    : {revalidate: CACHE_SECONDS}
-        });
+        let url = upstream.replace(/\{lang\}/g, language);
 
-        if(response.ok === false)
+        try
         {
-            throw new Error('upstream responded ' + response.status);
+            return Response.json(payloadFrom(await fetchUpstream(url), 'upstream', url), {headers: headers});
         }
-
-        let data = await response.json();
-
-        if(isUsable(data) === false)
+        catch(error)
         {
-            throw new Error('upstream payload is missing itemsData / recipesData / buildingsData');
-        }
+            let reason = error instanceof Error ? error.message : String(error);
+                console.error('GAME_DATA_URL fetch failed for ' + url + ':', reason);
 
-        return Response.json(
-            {
-                source          : 'upstream',
-                upstream        : url,
-                language        : language,
-                buildingsData   : normalize(data).buildingsData,
-                itemsData       : data.itemsData,
-                recipesData     : data.recipesData
-            },
-            {headers: {'cache-control': 'public, s-maxage=' + CACHE_SECONDS + ', stale-while-revalidate=86400'}}
-        );
-    }
-    catch(error)
-    {
-        failure = error instanceof Error ? error.message : String(error);
-        console.error('game data fetch failed for ' + url + ':', failure);
+            return Response.json(
+                payloadFrom(structuredClone(gameData), 'bundled', 'GAME_DATA_URL (' + url + ') failed: ' + reason),
+                {headers: {'cache-control': 'no-store'}}
+            );
+        }
     }
 
-    // Still answer with something the planner can run on, flagged so the page
-    // can say plainly that this is not the real game data.
-    let fallback = normalize(structuredClone(sampleGameData));
-
-    return Response.json(
-        {
-            source          : 'sample',
-            upstream        : url,
-            language        : language,
-            error           : failure,
-            buildingsData   : fallback.buildingsData,
-            itemsData       : fallback.itemsData,
-            recipesData     : fallback.recipesData
-        },
-        {headers: {'cache-control': 'no-store'}}
-    );
+    return Response.json(payloadFrom(structuredClone(gameData), 'bundled', null), {headers: headers});
 }
