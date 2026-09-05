@@ -2,7 +2,8 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import ItemPicker from './ItemPicker.jsx';
 import ProductionGraph from './ProductionGraph.jsx';
-import {startPlannerWorker} from '../lib/plannerWorker.js';
+import {requestPanes, startPlannerWorker} from '../lib/plannerWorker.js';
+import {renderBuildingsList, renderItemsList, renderTreeList} from '../lib/resultHtml.mjs';
 import {
     ASSEMBLER_SPEEDS,
     DEFAULT_STATE,
@@ -42,9 +43,11 @@ export default function Planner({initialPayload})
     let [workerError, setWorkerError]   = useState(null);
 
     let [power, setPower]               = useState(null);
-    let [treeHtml, setTreeHtml]         = useState('');
-    let [itemsHtml, setItemsHtml]       = useState('');
-    let [buildingsHtml, setBuildings]   = useState('');
+    // What the worker posts for the three list panes: the data behind them,
+    // not the markup. lib/resultHtml.mjs turns each into HTML below.
+    let [treeData, setTreeData]         = useState(null);
+    let [itemsData, setItemsData]       = useState(null);
+    let [buildingsData, setBuildings]   = useState(null);
     let [graph, setGraph]               = useState({nodes: null, edges: [], direction: 'RIGHT'});
 
     let [tab, setTab]                   = useState('graph');
@@ -55,6 +58,14 @@ export default function Planner({initialPayload})
     let workerRef       = useRef(null);
     let isFirstRunRef   = useRef(true);
     let treeRef         = useRef(null);
+
+    // Which of the four results the current worker has been asked for, and
+    // which tab wants one. A run only builds the tab you are looking at; the
+    // rest are asked for when you open them.
+    let requestedRef    = useRef(new Set());
+    let awaitingGraph   = useRef(false);
+    let tabRef          = useRef(tab);
+        tabRef.current  = tab;
 
     // Game data -------------------------------------------------------------
     useEffect(function(){
@@ -104,9 +115,17 @@ export default function Planner({initialPayload})
 
         setWorkerError(null);
         setPower(null);
-        setTreeHtml('');
-        setItemsHtml('');
-        setBuildings('');
+        setTreeData(null);
+        setItemsData(null);
+        setBuildings(null);
+        // Left up, the old layout would read as this plan's until the graph
+        // pane is asked for again, which may be never.
+        setGraph({nodes: null, edges: [], direction: currentState.direction});
+
+        let firstPane = tabRef.current;
+
+        requestedRef.current    = new Set([firstPane]);
+        awaitingGraph.current   = (firstPane === 'graph');
 
         workerRef.current = startPlannerWorker({
             language    : currentGameData.language || 'en',
@@ -116,9 +135,11 @@ export default function Planner({initialPayload})
             // worker has no option for.
             recipes     : recipesForState(currentState, currentGameData.recipesData),
             formData    : buildFormData(currentState),
+            panes       : [firstPane],
 
             onError     : function(message){
                 setWorkerError(message);
+                awaitingGraph.current = false;
                 setBusy(false);
             },
 
@@ -145,15 +166,15 @@ export default function Planner({initialPayload})
                         break;
 
                     case 'updateTreeList':
-                        setTreeHtml(message.html);
+                        setTreeData(message);
                         break;
 
                     case 'updateItemsList':
-                        setItemsHtml(message.html);
+                        setItemsData(message);
                         break;
 
                     case 'updateBuildingsList':
-                        setBuildings(message.html);
+                        setBuildings(message);
                         break;
 
                     case 'updateGraphNetwork':
@@ -161,6 +182,21 @@ export default function Planner({initialPayload})
                         break;
 
                     case 'done':
+                        // A tab opened while the worker was busy could not be
+                        // asked for then; its turn is now.
+                        if(requestedRef.current.has(tabRef.current) === false && workerRef.current !== null)
+                        {
+                            requestedRef.current.add(tabRef.current);
+                            awaitingGraph.current = awaitingGraph.current || tabRef.current === 'graph';
+
+                            requestPanes(workerRef.current, [tabRef.current]);
+                            break;
+                        }
+
+                        if(awaitingGraph.current === false)
+                        {
+                            setBusy(false);
+                        }
                         break;
 
                     default:
@@ -202,10 +238,44 @@ export default function Planner({initialPayload})
         };
     }, []);
 
+    // Opening a tab this run has not built yet. The worker still has the graph
+    // it worked out, so this is the one result, not the whole calculation.
+    // While it is still busy the request would sit behind the run anyway, so
+    // the 'done' handler picks it up instead.
+    useEffect(function(){
+        if(workerRef.current === null || busy === true || requestedRef.current.has(tab) === true)
+        {
+            return;
+        }
+
+        requestedRef.current.add(tab);
+
+        if(tab === 'graph')
+        {
+            awaitingGraph.current = true;
+        }
+
+        requestPanes(workerRef.current, [tab]);
+    }, [tab, busy]);
+
+    // The markup for the three list panes. The worker posts the data and this
+    // is where it becomes HTML.
+    let treeHtml = useMemo(function(){
+        return treeData === null ? '' : renderTreeList(treeData);
+    }, [treeData]);
+
+    let itemsHtml = useMemo(function(){
+        return itemsData === null ? '' : renderItemsList(itemsData);
+    }, [itemsData]);
+
+    let buildingsHtml = useMemo(function(){
+        return buildingsData === null ? '' : renderBuildingsList(buildingsData);
+    }, [buildingsData]);
+
     // Item art is sliced out of the FactorioLab sprite into public/icons at
     // build time. If one is missing, swap in the placeholder rather than
-    // leaving a broken-image glyph. Images arrive inside worker-generated
-    // HTML, so this listens on the capture phase - "error" does not bubble.
+    // leaving a broken-image glyph. Images arrive inside generated HTML, so
+    // this listens on the capture phase - "error" does not bubble.
     useEffect(function(){
         function onError(event)
         {
@@ -648,7 +718,10 @@ export default function Planner({initialPayload})
                                 nodes={graph.nodes}
                                 edges={graph.edges}
                                 direction={graph.direction}
-                                onLayoutDone={function(){ setBusy(false); }}
+                                onLayoutDone={function(){
+                                    awaitingGraph.current = false;
+                                    setBusy(false);
+                                }}
                             />
                         </div>
 

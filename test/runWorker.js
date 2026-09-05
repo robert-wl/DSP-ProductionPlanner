@@ -16,9 +16,16 @@ const path = require('path');
 const vm   = require('vm');
 
 const gameData = require('./fixtures/gameData.js');
+const {renderTreeList, renderItemsList, renderBuildingsList} = require('../lib/resultHtml.mjs');
 
 const CURRENT_WORKER   = path.join(__dirname, '..', 'src', 'Worker.js');
 const REFERENCE_WORKER = path.join(__dirname, 'fixtures', 'referenceWorker.js');
+
+const LIST_RENDERERS = {
+    updateTreeList      : renderTreeList,
+    updateItemsList     : renderItemsList,
+    updateBuildingsList : renderBuildingsList
+};
 
 /**
  * Instantiates a worker and returns its global scope, so tests can either
@@ -63,7 +70,11 @@ function runScenario(workerSourcePath, scenario)
             items       : structuredClone(gameData.items),
             recipes     : structuredClone(gameData.recipes),
 
-            formData    : structuredClone(scenario.formData)
+            formData    : structuredClone(scenario.formData),
+
+            // Left undefined by every differential scenario, which is what
+            // makes the worker build all four results like it always did
+            panes       : scenario.panes
         }
     });
 
@@ -78,6 +89,11 @@ function runScenario(workerSourcePath, scenario)
  * and would never compare deep-strict-equal to anything built out here. Round
  * tripping through JSON both flattens them into plain host objects and mirrors
  * what postMessage would hand to the page anyway.
+ *
+ * The reference worker posts the three list panes as HTML. The current one
+ * posts the data behind them and leaves the markup to lib/resultHtml.mjs, so
+ * that runs here too: the differential then compares like with like, and pins
+ * the renderer as well as the calculation.
  */
 function outputOf(workerSourcePath, scenario)
 {
@@ -85,7 +101,17 @@ function outputOf(workerSourcePath, scenario)
         return message.type !== 'updateLoaderText' && message.type !== 'showLoader';
     });
 
-    return JSON.parse(JSON.stringify(messages));
+    return JSON.parse(JSON.stringify(messages)).map(function(message){
+        let render = LIST_RENDERERS[message.type];
+
+            // Already markup: the reference worker's own output, left alone
+            if(render === undefined || message.html !== undefined)
+            {
+                return message;
+            }
+
+        return {type: message.type, html: render(message)};
+    });
 }
 
 module.exports = {loadWorker, runScenario, outputOf, CURRENT_WORKER, REFERENCE_WORKER};

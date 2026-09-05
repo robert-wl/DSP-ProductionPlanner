@@ -95,8 +95,8 @@ all reversible there:
 
 The generator prints what it dropped and why on every run.
 
-Icons are sliced into one file each rather than inlined as data URIs: the worker
-builds HTML strings with `<img src="{item.image}">`, so a data URI would
+Icons are sliced into one file each rather than inlined as data URIs: the list
+panes are markup with `<img src="{item.image}">` in them, so a data URI would
 duplicate the bytes into every node of the tree. 174 icons come to ~700 KB, less
 than the 850 KB sprite they came from, and each one caches on its own.
 
@@ -116,8 +116,9 @@ npm run build-data   # regenerate public/data and public/icons
 | --- | --- |
 | `src/Worker.js` | The planner itself, untouched. It is one self-contained function so it can be stringified into a Blob and run as a real WebWorker. |
 | `src/main.jsx` | Entry point, and the whole router: `/` and `/json/<payload>`. |
-| `lib/plannerWorker.js` | Starts that worker and relays its messages. |
+| `lib/plannerWorker.js` | Starts that worker, relays its messages, and asks it for a result the page did not need up front. |
 | `lib/plannerState.js` | The planner's inputs, and their two shapes: the `formData` the worker expects, and the `/json/<payload>` share URL. |
+| `lib/resultHtml.mjs` | The markup for the production tree, items and buildings panes, built from what the worker posts. |
 | `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's templates. |
 | `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet the upstream page used. |
 | `scripts/buildGameData.mjs` | The FactorioLab → worker schema adapter, and the sprite slicer. |
@@ -126,14 +127,38 @@ npm run build-data   # regenerate public/data and public/icons
 Share URLs keep the upstream `/json/<url-encoded JSON>` shape, so links made by
 the original planner open here unchanged.
 
-`src/Worker.js` interpolates item names and URLs straight into the HTML it
-generates, exactly as it did upstream. That is safe because the table is
+### The worker only builds the tab you are looking at
+
+There are four results — the layout, the production tree, the items list and
+the buildings list — and every run used to build all four before it said it was
+done. Three of them were work nobody had asked to see, and on a large plan that
+is most of the run: for 6000 Assembling Machine Mk.II a minute the calculation
+is ~320 ms and the results on top of it are the rest.
+
+The page now names the tab it is showing, the worker builds that one, and the
+worker stays alive holding the graph it worked out. Opening another tab sends
+`requestPanes`, which is answered out of that graph — nothing is recalculated.
+The worker is terminated when the next calculation starts.
+
+| Tab open when the plan changes | Worker | Posted |
+| --- | ---: | ---: |
+| all four, as it used to | 452 ms | 19.40 MB |
+| Layout | 350 ms | 12.45 MB |
+| Production tree | 396 ms | 6.63 MB |
+| Items | 334 ms | 9 KB |
+| Buildings | 330 ms | 9 KB |
+
+Sending no `panes` at all builds everything, in tab order, which is what the
+differential suite relies on.
+
+`lib/resultHtml.mjs` interpolates item names and URLs straight into markup,
+exactly as `src/Worker.js` did upstream. That is safe because the table is
 generated here from a pinned source; it would not be safe against an arbitrary
 feed, which is one reason there is no longer an option to point it at one.
 
 ## Tests
 
-`npm test` runs the differential and unit suites over `src/Worker.js` — see
+`npm test` runs the differential, pane and unit suites over `src/Worker.js` — see
 [test/README.md](test/README.md). They diff the current worker against the
 reference implementation over fixtures of their own, so they are independent of
 whatever dataset ships: the calculation is untouched by this conversion, and
