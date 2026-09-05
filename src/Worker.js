@@ -15,7 +15,8 @@ export default function ProductionPlannerWorker()
         mergeBuildings              : 1,
         maxLevel                    : null,
         maxBeltSpeed                : 1800,
-        maxAssemblerSpeed           : 'Assembling_Machine_Mk2'
+        maxAssemblerSpeed           : 'Assembling_Machine_Mk2',
+        altRecipes                  : []
     };
 
     self.buildings      = {};
@@ -33,6 +34,28 @@ export default function ProductionPlannerWorker()
     self.graphEdges     = [];
     self.graphDirection = 'RIGHT';
 
+    // Static lookup indexes, built once from items/recipes/buildings instead of
+    // re-scanning those objects on every single node of the production tree.
+    self.itemIdByClassName              = null;
+    self.buildingKeyByClassName         = null;
+    self.recipesByProducedClassName     = null;
+    self.recipeIdByProducedClassName    = null;
+    self.recipeProduceLength            = null;
+
+    // Memoized results of the (deterministic) recipe/building resolvers.
+    self.recipeForItemCache             = {};
+    self.buildingForRecipeCache         = {};
+
+    // Live indexes of the graph, kept in sync while the tree is built.
+    self.byProductNodesByItem           = {};
+    self.lastNodeByItem                 = {};
+    self.mainNodesByItem                = {};
+    self.nodesById                      = null;
+    self.edgesByTargetId                = null;
+    self.hierarchyTreeCache             = null;
+
+    self.numberFormat                   = null;
+
     self.onmessage = function(e) {
         self.postMessage({type: 'showLoader'});
 
@@ -46,6 +69,117 @@ export default function ProductionPlannerWorker()
         self.recipes        = e.data.recipes;
 
         self.prepareOptions(e.data.formData);
+    };
+
+    // Intl.NumberFormat construction is expensive, and the lists below format
+    // thousands of values, so keep a single instance around.
+    self.formatNumber = function(value)
+    {
+        if(self.numberFormat === null)
+        {
+            self.numberFormat = new Intl.NumberFormat(self.locale);
+        }
+
+        return self.numberFormat.format(value);
+    };
+
+    self.buildLookupIndexes = function()
+    {
+        // Called once the options have pruned the unavailable buildings.
+        self.itemIdByClassName = {};
+        for(let itemId in self.items)
+        {
+            let className = self.items[itemId].className;
+
+                // Keep the first match, like the linear scan it replaces
+                if(className !== undefined && self.itemIdByClassName[className] === undefined)
+                {
+                    self.itemIdByClassName[className] = itemId;
+                }
+        }
+
+        self.buildingKeyByClassName = {};
+        for(let buildingKey in self.buildings)
+        {
+            let className = self.buildings[buildingKey].className;
+
+                if(className !== undefined && self.buildingKeyByClassName[className] === undefined)
+                {
+                    self.buildingKeyByClassName[className] = buildingKey;
+                }
+        }
+
+        self.recipesByProducedClassName  = {};
+        self.recipeIdByProducedClassName = {};
+        self.recipeProduceLength         = {};
+
+        for(let recipeKey in self.recipes)
+        {
+            if(self.recipes[recipeKey].produce === undefined)
+            {
+                continue;
+            }
+
+            let produceLength = 0;
+
+            for(let producedClassName in self.recipes[recipeKey].produce)
+            {
+                produceLength++;
+
+                if(self.recipeIdByProducedClassName[producedClassName] === undefined)
+                {
+                    self.recipeIdByProducedClassName[producedClassName] = recipeKey;
+                }
+
+                if(recipeKey.indexOf('_Alternative') === -1)
+                {
+                    if(self.recipesByProducedClassName[producedClassName] === undefined)
+                    {
+                        self.recipesByProducedClassName[producedClassName] = [];
+                    }
+
+                    self.recipesByProducedClassName[producedClassName].push(recipeKey);
+                }
+            }
+
+            self.recipeProduceLength[recipeKey] = produceLength;
+        }
+    };
+
+    // Pushes a node and keeps the per-type indexes up to date, so the tree
+    // builder never has to scan self.graphNodes looking for one.
+    self.addGraphNode = function(nodeData)
+    {
+        let node = {data: nodeData};
+            self.graphNodes.push(node);
+
+            if(nodeData.nodeType === 'byProductItem')
+            {
+                if(self.byProductNodesByItem[nodeData.itemId] === undefined)
+                {
+                    self.byProductNodesByItem[nodeData.itemId] = [];
+                }
+
+                self.byProductNodesByItem[nodeData.itemId].push(node);
+            }
+            else if(nodeData.nodeType === 'lastNodeItem')
+            {
+                if(self.lastNodeByItem[nodeData.itemId] === undefined)
+                {
+                    self.lastNodeByItem[nodeData.itemId] = node;
+                }
+            }
+            else if(nodeData.nodeType === 'mainNode')
+            {
+                if(self.mainNodesByItem[nodeData.itemId] === undefined)
+                {
+                    self.mainNodesByItem[nodeData.itemId] = [];
+                }
+
+                self.mainNodesByItem[nodeData.itemId].push(node);
+            }
+
+        return node;
     };
 
     self.prepareOptions = function(formData) {
@@ -170,6 +304,8 @@ export default function ProductionPlannerWorker()
     };
 
     self.startCalculation = function() {
+        self.buildLookupIndexes();
+
         // Add pseudo-by products for inputs...
         for(let itemKey in self.inputItems)
         {
@@ -187,7 +323,7 @@ export default function ProductionPlannerWorker()
                     let mainNodeVisId  = itemKey + '_' + self.nodeIdKey;
                         self.nodeIdKey++;
 
-                        self.graphNodes.push({data: {
+                        self.addGraphNode({
                             id                  : mainNodeVisId + '_byProduct',
                             nodeType            : 'byProductItem',
                             itemId              : itemKey,
@@ -195,7 +331,7 @@ export default function ProductionPlannerWorker()
                             qtyProduced         : ((self.items[itemKey].category === 'liquid' || self.items[itemKey].category === 'gas') ? (maxMergedQty / 1000) : maxMergedQty),
                             neededQty           : ((self.items[itemKey].category === 'liquid' || self.items[itemKey].category === 'gas') ? (maxMergedQty / 1000) : maxMergedQty),
                             image               : self.items[itemKey].image
-                        }});
+                        });
 
                         requestedQty -= maxMergedQty;
                 }
@@ -205,7 +341,7 @@ export default function ProductionPlannerWorker()
                     let mainNodeVisId  = itemKey + '_' + self.nodeIdKey;
                         self.nodeIdKey++;
 
-                        self.graphNodes.push({data: {
+                        self.addGraphNode({
                             id                  : mainNodeVisId + '_byProduct',
                             nodeType            : 'byProductItem',
                             itemId              : itemKey,
@@ -213,8 +349,7 @@ export default function ProductionPlannerWorker()
                             qtyProduced         : ((self.items[itemKey].category === 'liquid' || self.items[itemKey].category === 'gas') ? (requestedQty / 1000) : requestedQty),
                             neededQty           : ((self.items[itemKey].category === 'liquid' || self.items[itemKey].category === 'gas') ? (requestedQty / 1000) : requestedQty),
                             image               : self.items[itemKey].image
-                        }});
-                    console.log(itemKey);
+                        });
                 }
         }
 
@@ -251,20 +386,72 @@ export default function ProductionPlannerWorker()
             // Loop backwards so the miners/pumps are overclocked before the production buildings ;)
             for(let pass = 1; pass <= 2; pass++)
             {
+                // Only production buildings sharing a recipe can ever merge, so bucket
+                // them once per pass rather than testing every pair of nodes. Edges are
+                // indexed by endpoint too, so re-wiring a merged node costs O(degree)
+                // instead of a full scan of self.graphEdges.
+                let nodesByRecipe   = {};
+                let edgesBySource   = {};
+                let edgesByTarget   = {};
+
                 for(let i = self.graphNodes.length - 1; i >= 0 ; i--)
                 {
-                    for(let j = self.graphNodes.length - 1; j >= 0 ; j--)
+                    if(self.graphNodes[i] === undefined || self.graphNodes[i].data.nodeType !== 'productionBuilding')
                     {
-                        if(i !== j && self.graphNodes[i] !== undefined && self.graphNodes[j] !== undefined) // Not yet tested...
+                        continue;
+                    }
+
+                    let nodeRecipe = self.graphNodes[i].data.recipe;
+                        if(nodesByRecipe[nodeRecipe] === undefined)
                         {
-                            let mergingNodeData = self.graphNodes[i].data;
+                            nodesByRecipe[nodeRecipe] = [];
+                        }
+
+                        // Filled descending, to keep the original iteration order
+                        nodesByRecipe[nodeRecipe].push(i);
+                }
+
+                for(let k = 0; k < self.graphEdges.length; k++)
+                {
+                    if(self.graphEdges[k] === undefined)
+                    {
+                        continue;
+                    }
+
+                    let edgeData = self.graphEdges[k].data;
+
+                        if(edgesBySource[edgeData.source] === undefined)
+                        {
+                            edgesBySource[edgeData.source] = [];
+                        }
+                        edgesBySource[edgeData.source].push(self.graphEdges[k]);
+
+                        if(edgesByTarget[edgeData.target] === undefined)
+                        {
+                            edgesByTarget[edgeData.target] = [];
+                        }
+                        edgesByTarget[edgeData.target].push(self.graphEdges[k]);
+                }
+
+                for(let i = self.graphNodes.length - 1; i >= 0 ; i--)
+                {
+                    if(self.graphNodes[i] === undefined || self.graphNodes[i].data.nodeType !== 'productionBuilding')
+                    {
+                        continue;
+                    }
+
+                    let mergingNodeData = self.graphNodes[i].data;
+                    let sameRecipeNodes = nodesByRecipe[mergingNodeData.recipe];
+
+                    for(let n = 0; n < sameRecipeNodes.length; n++)
+                    {
+                        let j = sameRecipeNodes[n];
+
+                        if(i !== j && self.graphNodes[j] !== undefined) // Not yet tested...
+                        {
                             let sourceNodeData  = self.graphNodes[j].data;
 
-                            if(
-                                   mergingNodeData.nodeType === 'productionBuilding' && mergingNodeData.nodeType === sourceNodeData.nodeType && mergingNodeData.id !== sourceNodeData.id
-                                // Both nodes needs to have the same recipe ^^
-                                && mergingNodeData.recipe === sourceNodeData.recipe
-                            )
+                            if(mergingNodeData.id !== sourceNodeData.id)
                             {
                                 if(mergingNodeData.qtyUsed < mergingNodeData.qtyProduced || self.options.viewMode === 'SIMPLE')
                                 {
@@ -284,24 +471,12 @@ export default function ProductionPlannerWorker()
                                     if((mergedQty <= mergingNodeData.qtyProduced && mergedQty <= maxBeltSpeed) || self.options.viewMode === 'SIMPLE')
                                     {
                                         // Tests if input/output are allowed to that new speed...
-                                        let canMergeInputs  = self.testEdgesMaxSpeeds(mergingNodeData, sourceNodeData, mergedPercentage);
+                                        let canMergeInputs  = self.testEdgesMaxSpeeds(mergingNodeData, sourceNodeData, mergedPercentage, edgesByTarget);
                                             if(canMergeInputs === true && mergedPercentage === 100)
                                             {
-                                                // Update edges!
-                                                for(let k = 0; k < self.graphEdges.length; k++)
-                                                {
-                                                    if(self.graphEdges[k] !== undefined)
-                                                    {
-                                                        if(self.graphEdges[k].data.source === sourceNodeData.id)
-                                                        {
-                                                            self.graphEdges[k].data.source = mergingNodeData.id;
-                                                        }
-                                                        if(self.graphEdges[k].data.target === sourceNodeData.id)
-                                                        {
-                                                            self.graphEdges[k].data.target = mergingNodeData.id;
-                                                        }
-                                                    }
-                                                }
+                                                // Update edges! Only the ones touching the node we drop.
+                                                self.moveIndexedEdges(edgesBySource, sourceNodeData.id, mergingNodeData.id, 'source');
+                                                self.moveIndexedEdges(edgesByTarget, sourceNodeData.id, mergingNodeData.id, 'target');
 
                                                 delete self.graphNodes[j];
 
@@ -353,19 +528,29 @@ export default function ProductionPlannerWorker()
                 }
 
                 // Update previous merged edges...
+                // The first edge of each source/target pair absorbs the others,
+                // which a single hashed pass does as well as the O(n^2) sweep.
+                let mergedEdgesByEndpoints = new Map();
+
                 for(let i = 0; i < self.graphEdges.length; i++)
                 {
-                    for(let j = 0; j < self.graphEdges.length; j++)
+                    if(self.graphEdges[i] === undefined)
                     {
-                        if(i !== j && self.graphEdges[i] !== undefined && self.graphEdges[j] !== undefined) // Not yet tested...
-                        {
-                            if(self.graphEdges[i].data.source === self.graphEdges[j].data.source && self.graphEdges[i].data.target === self.graphEdges[j].data.target)
-                            {
-                                self.graphEdges[i].data.qty += self.graphEdges[j].data.qty;
-                                delete self.graphEdges[j];
-                            }
-                        }
+                        continue;
                     }
+
+                    let endpointsKey    = self.graphEdges[i].data.source + '\u0000' + self.graphEdges[i].data.target;
+                    let existingEdge    = mergedEdgesByEndpoints.get(endpointsKey);
+
+                        if(existingEdge === undefined)
+                        {
+                            mergedEdgesByEndpoints.set(endpointsKey, self.graphEdges[i]);
+                        }
+                        else
+                        {
+                            existingEdge.data.qty += self.graphEdges[i].data.qty;
+                            delete self.graphEdges[i];
+                        }
                 }
             }
         }
@@ -375,10 +560,35 @@ export default function ProductionPlannerWorker()
             self.postMessage({type: 'updateLoaderText', text: 'Building manifolds...'});
 
             // Add merger
-            let mergers     = [];
-            let mergerKey   = 0;
+            let mergers         = [];
+            let mergerKey       = 0;
+            let mergerScanLength = self.graphEdges.length;
 
-            for(let i = self.graphEdges.length - 1; i >= 0 ; i--)
+            // Only edges carrying the same item into the same target can be merged,
+            // so bucket them once instead of rescanning every edge for every edge.
+            let edgesByItemAndTarget = new Map();
+
+            for(let i = mergerScanLength - 1; i >= 0 ; i--)
+            {
+                if(self.graphEdges[i] === undefined)
+                {
+                    continue;
+                }
+
+                let mergerBucketKey = self.graphEdges[i].data.itemId + '\u0000' + self.graphEdges[i].data.target;
+                let mergerBucket    = edgesByItemAndTarget.get(mergerBucketKey);
+
+                    if(mergerBucket === undefined)
+                    {
+                        mergerBucket = [];
+                        edgesByItemAndTarget.set(mergerBucketKey, mergerBucket);
+                    }
+
+                    // Filled descending, to keep the original iteration order
+                    mergerBucket.push(i);
+            }
+
+            for(let i = mergerScanLength - 1; i >= 0 ; i--)
             {
                 if(self.graphEdges[i] === undefined)
                 {
@@ -389,9 +599,12 @@ export default function ProductionPlannerWorker()
                 let currentMerger   = [];
                 let mergerQty       = 0;
                 let maxMergedQty    = self.options.maxBeltSpeed;
+                let mergerBucket    = edgesByItemAndTarget.get(parentEdge.data.itemId + '\u0000' + parentEdge.data.target);
 
-                for(let j = self.graphEdges.length - 1; j >= 0 ; j--)
+                for(let n = 0; n < mergerBucket.length; n++)
                 {
+                    let j = mergerBucket[n];
+
                     if(self.graphEdges[j] === undefined)
                     {
                         continue;
@@ -399,18 +612,15 @@ export default function ProductionPlannerWorker()
 
                     if(parentEdge.data.id !== self.graphEdges[j].data.id) // Not yet tested...
                     {
-                        if(parentEdge.data.itemId === self.graphEdges[j].data.itemId && parentEdge.data.target === self.graphEdges[j].data.target)
+                        if((mergerQty + self.graphEdges[j].data.qty) <= maxMergedQty)
                         {
-                            if((mergerQty + self.graphEdges[j].data.qty) <= maxMergedQty)
+                            if(self.graphEdges[j].data.qty >= 0.1)
                             {
-                                if(self.graphEdges[j].data.qty >= 0.1)
-                                {
-                                    mergerQty += self.graphEdges[j].data.qty;
-                                    currentMerger.push(self.graphEdges[j]);
-                                }
-
-                                delete self.graphEdges[j];
+                                mergerQty += self.graphEdges[j].data.qty;
+                                currentMerger.push(self.graphEdges[j]);
                             }
+
+                            delete self.graphEdges[j];
                         }
                     }
                 }
@@ -486,18 +696,46 @@ export default function ProductionPlannerWorker()
             }
 
             // Add splitter
-            let splitters   = [];
-            let splitterKey = 0;
-            for(let i = 0; i < self.graphEdges.length; i++)
+            let splitters           = [];
+            let splitterKey         = 0;
+            let splitterScanLength  = self.graphEdges.length;
+
+            // Same idea as the mergers, bucketed on the shared source this time.
+            let edgesByItemAndSource = new Map();
+
+            for(let i = 0; i < splitterScanLength; i++)
+            {
+                if(self.graphEdges[i] === undefined)
+                {
+                    continue;
+                }
+
+                let splitterBucketKey   = self.graphEdges[i].data.itemId + '\u0000' + self.graphEdges[i].data.source;
+                let splitterBucket      = edgesByItemAndSource.get(splitterBucketKey);
+
+                    if(splitterBucket === undefined)
+                    {
+                        splitterBucket = [];
+                        edgesByItemAndSource.set(splitterBucketKey, splitterBucket);
+                    }
+
+                    splitterBucket.push(i);
+            }
+
+            for(let i = 0; i < splitterScanLength; i++)
             {
                 let currentSplitter   = [];
                 let splitterQty       = 0;
 
-                for(let j = 0; j < self.graphEdges.length; j++)
+                if(self.graphEdges[i] !== undefined)
                 {
-                    if(i !== j && self.graphEdges[i] !== undefined && self.graphEdges[j] !== undefined) // Not yet tested...
+                    let splitterBucket = edgesByItemAndSource.get(self.graphEdges[i].data.itemId + '\u0000' + self.graphEdges[i].data.source);
+
+                    for(let n = 0; n < splitterBucket.length; n++)
                     {
-                        if(self.graphEdges[i].data.itemId === self.graphEdges[j].data.itemId && self.graphEdges[i].data.source === self.graphEdges[j].data.source)
+                        let j = splitterBucket[n];
+
+                        if(i !== j && self.graphEdges[j] !== undefined) // Not yet tested...
                         {
                             if(self.graphEdges[j].data.qty >= 0.1)
                             {
@@ -589,7 +827,7 @@ export default function ProductionPlannerWorker()
 
             if(node.data.nodeType === 'mainNode')
             {
-                self.graphNodes[i].data.label   = new Intl.NumberFormat(self.locale).format(Math.ceil(node.data.qty))
+                self.graphNodes[i].data.label   = self.formatNumber(Math.ceil(node.data.qty))
                                                 + ' ' + self.items[node.data.itemId].name;
             }
 
@@ -653,7 +891,7 @@ export default function ProductionPlannerWorker()
                     if(self.options.viewMode === 'REALISTIC')
                     {
                         self.graphNodes[i].data.label   = self.buildings[node.data.buildingType].name
-                                                        + ' (' + new Intl.NumberFormat(self.locale).format(Math.round(performance)) + '%)'
+                                                        + ' (' + self.formatNumber(Math.round(performance)) + '%)'
                                                         + '\n' + '(' + self.recipes[self.graphNodes[i].data.recipe].name + ')'
                                                         //+ '\n' + '(' + node.data.id + ')' // DEBUG
                                                         //+ '\n' + '(' + node.data.qtyUsed + '/' + node.data.qtyProduced + ')' // DEBUG
@@ -662,7 +900,7 @@ export default function ProductionPlannerWorker()
 
                     if(self.options.viewMode === 'SIMPLE')
                     {
-                        self.graphNodes[i].data.label   = 'x' + new Intl.NumberFormat(self.locale).format(Math.ceil(performance / 10) / 10)
+                        self.graphNodes[i].data.label   = 'x' + self.formatNumber(Math.ceil(performance / 10) / 10)
                                                         + ' ' + self.buildings[node.data.buildingType].name
                                                         + '\n' + '(' + self.recipes[self.graphNodes[i].data.recipe].name + ')';
                                                         //+ '(' + node.data.qtyUsed + '/' + node.data.qtyProduced + ')'; // DEBUG
@@ -695,7 +933,7 @@ export default function ProductionPlannerWorker()
 
             if(node.data.nodeType === 'lastNodeItem' || node.data.nodeType === 'byProductItem')
             {
-                self.graphNodes[i].data.label   = new Intl.NumberFormat(self.locale).format(Math.ceil(node.data.neededQty))
+                self.graphNodes[i].data.label   = self.formatNumber(Math.ceil(node.data.neededQty))
                                                 + ' ' + self.items[node.data.itemId].name;
 
                 if(node.data.nodeType === 'byProductItem')
@@ -748,24 +986,27 @@ export default function ProductionPlannerWorker()
     };
 
     self.startMainNode = function(itemKey, mainRequiredQty) {
-        console.log('startMainNode', itemKey, mainRequiredQty);
+        if(self.debug === true)
+        {
+            console.log('startMainNode', itemKey, mainRequiredQty);
+        }
 
         let currentRecipe           = self.getRecipeToProduceItemId(itemKey);
 
         if(currentRecipe !== null)
         {
-            self.postMessage({type: 'updateLoaderText', text: 'Calculating production of ' + new Intl.NumberFormat(self.locale).format(mainRequiredQty) + ' ' + self.items[itemKey].name + '...'});
+            self.postMessage({type: 'updateLoaderText', text: 'Calculating production of ' + self.formatNumber(mainRequiredQty) + ' ' + self.items[itemKey].name + '...'});
 
             let mainNodeVisId  = itemKey + '_' + self.nodeIdKey;
                 self.nodeIdKey++;
 
-            self.graphNodes.push({data: {
+            self.addGraphNode({
                 id          : mainNodeVisId,
                 nodeType    : 'mainNode',
                 itemId      : itemKey,
                 qty         : mainRequiredQty,
                 image       : self.items[itemKey].image
-            }});
+            });
 
             // Build tree...
             while(mainRequiredQty > 0)
@@ -773,35 +1014,32 @@ export default function ProductionPlannerWorker()
                 let usesByProduct = false;
 
                 // Can we use by product?
-                for(let i = 0; i < self.graphNodes.length; i ++)
+                let byProductNodes = self.byProductNodesByItem[itemKey];
+
+                for(let i = 0; byProductNodes !== undefined && i < byProductNodes.length; i ++)
                 {
-                    if(self.graphNodes[i].data.nodeType === 'byProductItem')
-                    {
-                        if(self.graphNodes[i].data.itemId === itemKey)
+                    let byProductData   = byProductNodes[i].data;
+                    let remainingQty    = byProductData.qtyProduced - byProductData.qtyUsed;
+                    let useQty          = Math.min(remainingQty, mainRequiredQty);
+                        if(useQty < 0)
                         {
-                            let remainingQty    = self.graphNodes[i].data.qtyProduced - self.graphNodes[i].data.qtyUsed;
-                            let useQty          = Math.min(remainingQty, mainRequiredQty);
-                                if(useQty < 0)
-                                {
-                                    useQty = remainingQty;
-                                }
-
-                            if(remainingQty > 0 && useQty > 0)
-                            {
-                                // Add edge between byProduct and item..
-                                self.graphEdges.push({data: {
-                                    id                  : self.graphNodes[i].data.id + '_' + mainNodeVisId,
-                                    source              : self.graphNodes[i].data.id,
-                                    target              : mainNodeVisId,
-                                    itemId              : itemKey,
-                                    qty                 : useQty
-                                }});
-
-                                self.graphNodes[i].data.qtyUsed    += useQty;
-                                mainRequiredQty                    -= useQty;
-                                usesByProduct                       = true;
-                            }
+                            useQty = remainingQty;
                         }
+
+                    if(remainingQty > 0 && useQty > 0)
+                    {
+                        // Add edge between byProduct and item..
+                        self.graphEdges.push({data: {
+                            id                  : byProductData.id + '_' + mainNodeVisId,
+                            source              : byProductData.id,
+                            target              : mainNodeVisId,
+                            itemId              : itemKey,
+                            qty                 : useQty
+                        }});
+
+                        byProductData.qtyUsed  += useQty;
+                        mainRequiredQty        -= useQty;
+                        usesByProduct           = true;
                     }
                 }
 
@@ -816,7 +1054,7 @@ export default function ProductionPlannerWorker()
                         level           : 1
                     });
 
-                    if(qtyProducedByNode !== false)
+                    if(qtyProducedByNode !== false && qtyProducedByNode > 0)
                     {
                         // Reduce needed quantity
                         mainRequiredQty     -= qtyProducedByNode;
@@ -828,6 +1066,66 @@ export default function ProductionPlannerWorker()
                 }
             }
         }
+    };
+
+    self.isProductionTooFast = function(productionRecipe, productionCraftingTime, qtyProduced, qtyUsed, maxProductionSpeed)
+    {
+        if(qtyProduced > 0)
+        {
+            for(let recipeItemClassName in productionRecipe)
+            {
+                let requiredQty = (60 / productionCraftingTime * productionRecipe[recipeItemClassName]) * qtyUsed / qtyProduced;
+
+                    if(requiredQty > maxProductionSpeed)
+                    {
+                        return true;
+                    }
+            }
+        }
+
+        return false;
+    };
+
+    // This used to decrement qtyUsed one unit at a time until every ingredient
+    // belt fitted under maxProductionSpeed, which is O(qtyUsed) iterations.
+    // The smallest acceptable value is solvable directly, so jump to it and
+    // only step the last unit or two to stay bit-for-bit identical.
+    self.reduceQtyUsedToBeltSpeed = function(productionRecipe, productionCraftingTime, qtyProduced, qtyUsed, maxProductionSpeed)
+    {
+        if(qtyProduced <= 0)
+        {
+            return qtyUsed;
+        }
+
+        let maxAllowedQty = Infinity;
+
+            for(let recipeItemClassName in productionRecipe)
+            {
+                let qtyPerUnit = (60 / productionCraftingTime * productionRecipe[recipeItemClassName]) / qtyProduced;
+
+                    if(qtyPerUnit > 0)
+                    {
+                        maxAllowedQty = Math.min(maxAllowedQty, maxProductionSpeed / qtyPerUnit);
+                    }
+            }
+
+        if(maxAllowedQty !== Infinity)
+        {
+            // Math.floor never overshoots, so the loop below can only ever add
+            // the one step that floating point rounding may have shaved off.
+            let steps = Math.floor(qtyUsed - maxAllowedQty);
+                if(steps > 0)
+                {
+                    qtyUsed -= steps;
+                }
+        }
+
+        while(self.isProductionTooFast(productionRecipe, productionCraftingTime, qtyProduced, qtyUsed, maxProductionSpeed))
+        {
+            qtyUsed--;
+        }
+
+        return qtyUsed;
     };
 
     self.buildCurrentNodeTree = function(options)
@@ -899,26 +1197,7 @@ export default function ProductionPlannerWorker()
                         // Should we reduce builgind speed for belts?
                         if(productionRecipe !== false)
                         {
-                            let isTooFast = true;
-                                while(isTooFast === true)
-                                {
-                                    isTooFast = false;
-
-                                    if(qtyProduced > 0)
-                                    {
-                                        for(let recipeItemClassName in productionRecipe)
-                                        {
-                                            let requiredQty     = (60 / productionCraftingTime * productionRecipe[recipeItemClassName]) * qtyUsed / qtyProduced;
-                                                if(requiredQty > maxProductionSpeed)
-                                                {
-                                                    console.log(recipeItemClassName, requiredQty, maxProductionSpeed, qtyProduced);
-                                                    isTooFast = true;
-                                                    qtyUsed--;
-                                                    break;
-                                                }
-                                        }
-                                    }
-                                }
+                            qtyUsed = self.reduceQtyUsedToBeltSpeed(productionRecipe, productionCraftingTime, qtyProduced, qtyUsed, maxProductionSpeed);
                         }
 
                     // Push new node!
@@ -954,35 +1233,33 @@ export default function ProductionPlannerWorker()
                                 let byProductId     = self.getItemIdFromClassName(producedClassName);
                                 let byProductQty    = qtyUsed / productionPieces * self.recipes[options.recipe].produce[producedClassName];
 
-                                let alreadyExistsByProductNode = false;
+                                let alreadyExistsByProductNode  = false;
+                                let existingByProductNodes      = self.byProductNodesByItem[byProductId];
 
                                 // Find already last level item!
-                                for(let k = 0; k < self.graphNodes.length; k++)
+                                if(existingByProductNodes !== undefined && existingByProductNodes.length > 0)
                                 {
-                                    if(self.graphNodes[k].data.nodeType === 'byProductItem' && self.graphNodes[k].data.itemId === byProductId)
-                                    {
+                                    let existingByProductData = existingByProductNodes[0].data;
+
                                         alreadyExistsByProductNode = true;
 
-                                        self.graphNodes[k].data.qtyProduced  += byProductQty;
-                                        self.graphNodes[k].data.neededQty    += byProductQty;
+                                        existingByProductData.qtyProduced  += byProductQty;
+                                        existingByProductData.neededQty    += byProductQty;
 
                                         // Push new edges between node and parent
                                         self.graphEdges.push({data: {
-                                            id                  : currentParentVisId + '_' + self.graphNodes[k].data.id,
+                                            id                  : currentParentVisId + '_' + existingByProductData.id,
                                             source              : currentParentVisId,
-                                            target              : self.graphNodes[k].data.id,
+                                            target              : existingByProductData.id,
                                             itemId              : byProductId,
                                             recipe              : options.recipe,
                                             qty                 : byProductQty
                                         }});
-
-                                        break;
-                                    }
                                 }
 
                                 if(alreadyExistsByProductNode === false)
                                 {
-                                    self.graphNodes.push({data: {
+                                    self.addGraphNode({
                                         id                  : options.visId + '_byProduct',
                                         nodeType            : 'byProductItem',
                                         itemId              : byProductId,
@@ -990,7 +1267,7 @@ export default function ProductionPlannerWorker()
                                         qtyProduced         : byProductQty,
                                         neededQty           : byProductQty,
                                         image               : self.items[byProductId].image
-                                    }});
+                                    });
 
                                     // Push new edges between node and parent
                                     self.graphEdges.push({data: {
@@ -1015,26 +1292,22 @@ export default function ProductionPlannerWorker()
 
                             if(self.options.maxLevel !== null && self.options.maxLevel === (options.level + 1) && self.items[recipeItemId].category !== 'ore')
                             {
-                                let alreadyExistsLastNode = false;
+                                let alreadyExistsLastNode   = false;
+                                let existingLastNode        = self.lastNodeByItem[recipeItemId];
 
                                 // Find already last level item!
-                                for(let k = 0; k < self.graphNodes.length; k++)
+                                if(existingLastNode !== undefined)
                                 {
-                                    if(self.graphNodes[k].data.nodeType === 'lastNodeItem' && self.graphNodes[k].data.itemId === recipeItemId)
-                                    {
-                                        alreadyExistsLastNode = true;
+                                    alreadyExistsLastNode = true;
 
-                                        self.graphNodes[k].data.neededQty  += requiredQty;
-                                        self.graphEdges.push({data: {
-                                            id                  : self.graphNodes[k].data.id + '_' + currentParentVisId,
-                                            source              : self.graphNodes[k].data.id,
-                                            target              : currentParentVisId,
-                                            itemId              : recipeItemId,
-                                            qty                 : requiredQty
-                                        }});
-
-                                        break;
-                                    }
+                                    existingLastNode.data.neededQty  += requiredQty;
+                                    self.graphEdges.push({data: {
+                                        id                  : existingLastNode.data.id + '_' + currentParentVisId,
+                                        source              : existingLastNode.data.id,
+                                        target              : currentParentVisId,
+                                        itemId              : recipeItemId,
+                                        qty                 : requiredQty
+                                    }});
                                 }
 
                                 if(alreadyExistsLastNode === false)
@@ -1042,13 +1315,13 @@ export default function ProductionPlannerWorker()
                                     let lastNodeVisId = currentParentVisId + '_' + recipeItemId;
 
                                         // Push last node!
-                                        self.graphNodes.push({data: {
+                                        self.addGraphNode({
                                             id                  : lastNodeVisId,
                                             nodeType            : 'lastNodeItem',
                                             itemId              : recipeItemId,
                                             neededQty           : requiredQty,
                                             image               : self.items[recipeItemId].image
-                                        }});
+                                        });
 
                                         // Push new edges between node and parent
                                         self.graphEdges.push({data: {
@@ -1071,37 +1344,33 @@ export default function ProductionPlannerWorker()
                                         let usesByProduct = false;
 
                                         // Can we use by product?
-                                        for(let i = 0; i < self.graphNodes.length; i ++)
+                                        let byProductNodes = self.byProductNodesByItem[recipeItemId];
+
+                                        for(let i = 0; byProductNodes !== undefined && i < byProductNodes.length; i ++)
                                         {
-                                            if(self.graphNodes[i].data.nodeType === 'byProductItem')
-                                            {
-                                                if(self.graphNodes[i].data.itemId === recipeItemId)
+                                            let byProductData   = byProductNodes[i].data;
+                                            let remainingQty    = byProductData.qtyProduced - byProductData.qtyUsed;
+                                            let useQty          = Math.min(remainingQty, requiredQty);
+
+                                                if(useQty < 0)
                                                 {
-                                                    let remainingQty    = self.graphNodes[i].data.qtyProduced - self.graphNodes[i].data.qtyUsed;
-                                                    let useQty          = Math.min(remainingQty, requiredQty);
-
-                                                        if(useQty < 0)
-                                                        {
-                                                            useQty = remainingQty;
-                                                        }
-
-                                                    if(remainingQty > 0 && useQty > 0)
-                                                    {
-
-                                                            // Add edge between byProduct and item..
-                                                            self.graphEdges.push({data: {
-                                                                id                  : self.graphNodes[i].data.id + '_' + currentParentVisId,
-                                                                source              : self.graphNodes[i].data.id,
-                                                                target              : currentParentVisId,
-                                                                itemId              : recipeItemId,
-                                                                qty                 : useQty
-                                                            }});
-
-                                                            self.graphNodes[i].data.qtyUsed    += useQty;
-                                                            requiredQty                        -= useQty;
-                                                            usesByProduct                       = true;
-                                                    }
+                                                    useQty = remainingQty;
                                                 }
+
+                                            if(remainingQty > 0 && useQty > 0)
+                                            {
+                                                // Add edge between byProduct and item..
+                                                self.graphEdges.push({data: {
+                                                    id                  : byProductData.id + '_' + currentParentVisId,
+                                                    source              : byProductData.id,
+                                                    target              : currentParentVisId,
+                                                    itemId              : recipeItemId,
+                                                    qty                 : useQty
+                                                }});
+
+                                                byProductData.qtyUsed  += useQty;
+                                                requiredQty            -= useQty;
+                                                usesByProduct           = true;
                                             }
                                         }
 
@@ -1116,7 +1385,7 @@ export default function ProductionPlannerWorker()
                                                 level           : (options.level + 1)
                                             });
 
-                                            if(qtyProducedByNode !== false)
+                                            if(qtyProducedByNode !== false && qtyProducedByNode > 0)
                                             {
                                                 // Reduce needed quantity
                                                 requiredQty     -= qtyProducedByNode;
@@ -1133,13 +1402,13 @@ export default function ProductionPlannerWorker()
                                     let lastNodeVisId = currentParentVisId + '_' + recipeItemId;
 
                                         // Push last node!
-                                        self.graphNodes.push({data: {
+                                        self.addGraphNode({
                                             id                  : lastNodeVisId,
                                             nodeType            : 'lastNodeItem',
                                             itemId              : recipeItemId,
                                             neededQty           : requiredQty,
                                             image               : self.items[recipeItemId].image
-                                        }});
+                                        });
 
                                         // Push new edges between node and parent
                                         self.graphEdges.push({data: {
@@ -1160,9 +1429,48 @@ export default function ProductionPlannerWorker()
         return false;
     };
 
+    // The hierarchy is walked recursively and used to re-scan every node and every
+    // edge at each level. Index the (now final) graph once instead.
+    self.buildGraphIndexes = function()
+    {
+        self.nodesById          = new Map();
+        self.edgesByTargetId    = new Map();
+        self.hierarchyTreeCache = new Map();
+
+        for(let k = 0; k < self.graphNodes.length; k++)
+        {
+            let nodeId      = self.graphNodes[k].data.id;
+            let sameIdNodes = self.nodesById.get(nodeId);
+
+                // Node ids are not guaranteed unique, so keep them all
+                if(sameIdNodes === undefined)
+                {
+                    sameIdNodes = [];
+                    self.nodesById.set(nodeId, sameIdNodes);
+                }
+
+                sameIdNodes.push(self.graphNodes[k]);
+        }
+
+        for(let k = 0; k < self.graphEdges.length; k++)
+        {
+            let targetId        = self.graphEdges[k].data.target;
+            let incomingEdges   = self.edgesByTargetId.get(targetId);
+
+                if(incomingEdges === undefined)
+                {
+                    incomingEdges = [];
+                    self.edgesByTargetId.set(targetId, incomingEdges);
+                }
+
+                incomingEdges.push(self.graphEdges[k]);
+        }
+    };
+
     self.generateTreeList = function()
     {
         self.postMessage({type: 'updateLoaderText', text: 'Generating production list...'});
+        self.buildGraphIndexes();
         var html = [];
         var requestedItemsLength = Object.keys(requestedItems).length;
 
@@ -1190,15 +1498,14 @@ export default function ProductionPlannerWorker()
                             html.push('<div class="root">');
                                 html.push('<div class="child">');
                                     html.push('<img src="' + self.items[itemId].image + '" style="width: 40px;" class="mr-3" />');
-                                    html.push(new Intl.NumberFormat(self.locale).format(self.requestedItems[itemId]) + 'x ');
+                                    html.push(self.formatNumber(self.requestedItems[itemId]) + 'x ');
                                     html.push('<a href="' + self.items[itemId].url + '"style="line-height: 40px;">' + self.items[itemId].name + '</a>');
 
-                                    for(let k = 0; k < self.graphNodes.length; k++)
+                                    let itemMainNodes = self.mainNodesByItem[itemId];
+
+                                    for(let k = 0; itemMainNodes !== undefined && k < itemMainNodes.length; k++)
                                     {
-                                        if(self.graphNodes[k].data.nodeType === 'mainNode' && self.graphNodes[k].data.itemId === itemId)
-                                        {
-                                            html.push(self.buildHierarchyTree(self.graphNodes[k].data.id));
-                                        }
+                                        html.push(self.buildHierarchyTree(itemMainNodes[k].data.id));
                                     }
 
                                 html.push('</div>');
@@ -1217,17 +1524,23 @@ export default function ProductionPlannerWorker()
 
     self.buildHierarchyTree = function(parentId)
     {
+        let cachedHtml = self.hierarchyTreeCache.get(parentId);
+            if(cachedHtml !== undefined)
+            {
+                return cachedHtml;
+            }
+
+            // Also guards against a cycle sending the recursion infinite
+            self.hierarchyTreeCache.set(parentId, '');
+
         var html = [];
 
         // Build current parentId childrens
-        var children = [];
-        for(let k = 0; k < self.graphEdges.length; k++)
-        {
-            if(self.graphEdges[k].data.target === parentId)
+        var children = self.edgesByTargetId.get(parentId);
+            if(children === undefined)
             {
-                children.push(self.graphEdges[k]);
+                children = [];
             }
-        }
 
         if(children.length > 0)
         {
@@ -1235,44 +1548,46 @@ export default function ProductionPlannerWorker()
 
             for(let i = 0; i < children.length; i++)
             {
-                for(let k = 0; k < self.graphNodes.length; k++)
+                let childNodes = self.nodesById.get(children[i].data.source);
+
+                for(let k = 0; childNodes !== undefined && k < childNodes.length; k++)
                 {
-                    if(self.graphNodes[k].data.id === children[i].data.source)
-                    {
+                    let childNode = childNodes[k];
+
                         html.push('<div class="child">');
 
                             html.push('<div class="media">');
 
-                            if(self.graphNodes[k].data.nodeType === 'lastNodeItem' || self.graphNodes[k].data.nodeType === 'byProductItem')
+                            if(childNode.data.nodeType === 'lastNodeItem' || childNode.data.nodeType === 'byProductItem')
                             {
-                                html.push('<img src="' + self.items[self.graphNodes[k].data.itemId].image + '" alt="' + self.items[self.graphNodes[k].data.itemId].name + '" style="width: 40px;" class="mr-3" />');
+                                html.push('<img src="' + self.items[childNode.data.itemId].image + '" alt="' + self.items[childNode.data.itemId].name + '" style="width: 40px;" class="mr-3" />');
 
                                 html.push('<div class="media-body">');
-                                    html.push(new Intl.NumberFormat(self.locale).format(self.graphNodes[k].data.neededQty) + 'x ');
-                                    html.push('<a href="' + self.items[self.graphNodes[k].data.itemId].url + '" style="line-height: 40px;">' + self.items[self.graphNodes[k].data.itemId].name + '</a>');
+                                    html.push(self.formatNumber(childNode.data.neededQty) + 'x ');
+                                    html.push('<a href="' + self.items[childNode.data.itemId].url + '" style="line-height: 40px;">' + self.items[childNode.data.itemId].name + '</a>');
                                 html.push('</div>');
                             }
                             else
                             {
-                                if(self.graphNodes[k].data.nodeType === 'merger')
+                                if(childNode.data.nodeType === 'merger')
                                 {
-                                    self.graphNodes[k].data.buildingType = 'ConveyorBeltMk1';
+                                    childNode.data.buildingType = 'ConveyorBeltMk1';
                                 }
-                                if(self.graphNodes[k].data.nodeType === 'splitter')
+                                if(childNode.data.nodeType === 'splitter')
                                 {
-                                    self.graphNodes[k].data.buildingType = 'Splitter';
+                                    childNode.data.buildingType = 'Splitter';
                                 }
 
-                                html.push('<img src="' + self.buildings[self.graphNodes[k].data.buildingType].image + '" alt="' + self.buildings[self.graphNodes[k].data.buildingType].name + '" style="width: 40px;" class="mr-3 collapseChildren" />');
+                                html.push('<img src="' + self.buildings[childNode.data.buildingType].image + '" alt="' + self.buildings[childNode.data.buildingType].name + '" style="width: 40px;" class="mr-3 collapseChildren" />');
 
                                 html.push('<div class="media-body">');
-                                    html.push('<a href="' + self.buildings[self.graphNodes[k].data.buildingType].url + '">' + self.buildings[self.graphNodes[k].data.buildingType].name + '</a>');
+                                    html.push('<a href="' + self.buildings[childNode.data.buildingType].url + '">' + self.buildings[childNode.data.buildingType].name + '</a>');
 
-                                    if(self.graphNodes[k].data.nodeType === 'productionBuilding')
+                                    if(childNode.data.nodeType === 'productionBuilding')
                                     {
-                                        //html.push(' <em style="color: ' + self.graphNodes[k].data.performanceColor + '">(' + k + ')</em>'); // DEBUG
-                                        html.push(' <em style="color: ' + self.graphNodes[k].data.performanceColor + '">(' + self.graphNodes[k].data.performance + '%)</em>');
-                                        //html.push(' <em style="color: ' + self.graphNodes[k].data.performanceColor + '">(' + self.graphNodes[k].data.qtyUsed + ' / ' + self.graphNodes[k].data.qtyProduced + ')</em>'); // DEBUG
+                                        //html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + k + ')</em>'); // DEBUG
+                                        html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + childNode.data.performance + '%)</em>');
+                                        //html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + childNode.data.qtyUsed + ' / ' + childNode.data.qtyProduced + ')</em>'); // DEBUG
                                     }
 
                                     html.push('<br />');
@@ -1282,22 +1597,24 @@ export default function ProductionPlannerWorker()
 
                             html.push('</div>');
 
-                            if(self.graphNodes[k].data.nodeType !== 'byProductItem')
+                            if(childNode.data.nodeType !== 'byProductItem')
                             {
-                                html.push(self.buildHierarchyTree(self.graphNodes[k].data.id));
+                                html.push(self.buildHierarchyTree(childNode.data.id));
                             }
 
                         html.push('</div>');
 
                         //break; // Don't break as not merged belt can have more than one input...
-                    }
                 }
             }
 
             html.push('</div>');
         }
 
-        return html.join('');
+        let renderedHtml = html.join('');
+            self.hierarchyTreeCache.set(parentId, renderedHtml);
+
+        return renderedHtml;
     };
 
     self.generateItemsList = function()
@@ -1332,7 +1649,7 @@ export default function ProductionPlannerWorker()
                 html.push('<tr>');
                     html.push('<td width="40"><img src="' + self.items[itemId].image + '" style="width: 40px;" /></td>');
                     html.push('<td class="align-middle">');
-                        html.push(new Intl.NumberFormat(self.locale).format(self.listItems[itemId]) + ' units/min of ');
+                        html.push(self.formatNumber(self.listItems[itemId]) + ' units/min of ');
                         html.push('<a href="' + self.items[itemId].url + '">' + self.items[itemId].name + '</a>');
                    html.push('</td>');
                 html.push('</tr>');
@@ -1370,31 +1687,25 @@ export default function ProductionPlannerWorker()
                 let buildingClassName   = self.buildings[buildingId].className.replace(/Build_/g, 'Desc_');
 
                 // Build recipe...
-                for(let recipeId in self.recipes)
+                let recipeId = self.recipeIdByProducedClassName[buildingClassName];
+
+                if(recipeId !== undefined)
                 {
-                    if(self.recipes[recipeId].produce[buildingClassName] !== undefined)
+                    currentRecipe = [];
+
+                    for(let ingredient in self.recipes[recipeId].ingredients)
                     {
-                        currentRecipe = [];
+                        let itemId = self.getItemIdFromClassName(ingredient);
 
-                        for(let ingredient in self.recipes[recipeId].ingredients)
-                        {
-                            for(let itemId in self.items)
+                            if(itemId !== null)
                             {
-                                if(self.items[itemId].className === ingredient)
-                                {
-                                    currentRecipe.push({
-                                        id      : itemId,
-                                        name    : self.items[itemId].name,
-                                        image   : self.items[itemId].image,
-                                        qty     : self.recipes[recipeId].ingredients[ingredient]
-                                    });
-
-                                    break;
-                                }
+                                currentRecipe.push({
+                                    id      : itemId,
+                                    name    : self.items[itemId].name,
+                                    image   : self.items[itemId].image,
+                                    qty     : self.recipes[recipeId].ingredients[ingredient]
+                                });
                             }
-                        }
-
-                        break;
                     }
                 }
 
@@ -1402,7 +1713,7 @@ export default function ProductionPlannerWorker()
                 html.push('<td width="40" class="align-middle"><img src="' + self.buildings[buildingId].image + '" style="width: 40px;" /></td>');
 
                 html.push('<td class="align-middle">');
-                    html.push(new Intl.NumberFormat(self.locale).format(self.listBuildings[buildingId]) + 'x ');
+                    html.push(self.formatNumber(self.listBuildings[buildingId]) + 'x ');
                     html.push('<a href="' + self.buildings[buildingId].url + '">' + self.buildings[buildingId].name + '</a>');
                 html.push('</td>');
 
@@ -1416,7 +1727,7 @@ export default function ProductionPlannerWorker()
                         {
                             var recipeQty = self.listBuildings[buildingId] * currentRecipe[j].qty;
                             var temp = [];
-                                temp.push(new Intl.NumberFormat(self.locale).format(recipeQty) + 'x ');
+                                temp.push(self.formatNumber(recipeQty) + 'x ');
                                 temp.push('<img src="' + currentRecipe[j].image + '" title="' + currentRecipe[j].name + '" style="width: 24px;" />');
 
                             if(buildingsListRecipe[currentRecipe[j].id] === undefined)
@@ -1448,7 +1759,7 @@ export default function ProductionPlannerWorker()
                 {
                     html.push('<li class="list-group-item">');
 
-                    html.push(new Intl.NumberFormat(self.locale).format(buildingsListRecipe[idRecipe]) + 'x ');
+                    html.push(self.formatNumber(buildingsListRecipe[idRecipe]) + 'x ');
 
                     if(self.items[idRecipe] !== undefined)
                     {
@@ -1478,19 +1789,39 @@ export default function ProductionPlannerWorker()
 
     self.getItemIdFromClassName = function(itemClassName)
     {
-        for(let itemId in self.items)
+        if(self.itemIdByClassName === null)
         {
-            if(self.items[itemId].className === itemClassName)
-            {
-                return itemId;
-            }
+            self.buildLookupIndexes();
         }
 
-        return null;
+        let itemId = self.itemIdByClassName[itemClassName];
+
+        return (itemId !== undefined) ? itemId : null;
     };
 
     self.getRecipeToProduceItemId = function(itemId)
     {
+        // The result only depends on the (immutable) recipe list and options,
+        // so resolve it once per item instead of once per produced node.
+        let cachedRecipe = self.recipeForItemCache[itemId];
+            if(cachedRecipe !== undefined)
+            {
+                return cachedRecipe;
+            }
+
+        let foundRecipe = self.findRecipeToProduceItemId(itemId);
+            self.recipeForItemCache[itemId] = foundRecipe;
+
+        return foundRecipe;
+    };
+
+    self.findRecipeToProduceItemId = function(itemId)
+    {
+        if(self.recipesByProducedClassName === null)
+        {
+            self.buildLookupIndexes();
+        }
+
         let currentItemClassName    = self.items[itemId].className;
         let availableRecipes        = [];
 
@@ -1508,18 +1839,9 @@ export default function ProductionPlannerWorker()
                     }
             }
 
-            for(let recipeKey in self.recipes)
+            if(self.recipesByProducedClassName[currentItemClassName] !== undefined)
             {
-                if(recipeKey.indexOf('_Alternative') === -1)
-                {
-                    if(self.recipes[recipeKey].produce !== undefined)
-                    {
-                        if(self.recipes[recipeKey].produce[currentItemClassName] !== undefined)
-                        {
-                            availableRecipes.push(recipeKey);
-                        }
-                    }
-                }
+                availableRecipes = self.recipesByProducedClassName[currentItemClassName].slice();
             }
 
             if(availableRecipes.length > 0)
@@ -1531,17 +1853,8 @@ export default function ProductionPlannerWorker()
 
                 // Order by produce length
                 availableRecipes.sort(function(a, b){
-                    let aLength = 0;
-                    let bLength = 0;
-
-                        for(let item in self.recipes[a].produce)
-                        {
-                            aLength++;
-                        }
-                        for(let item in self.recipes[b].produce)
-                        {
-                            bLength++;
-                        }
+                    let aLength = self.recipeProduceLength[a];
+                    let bLength = self.recipeProduceLength[b];
 
                         if(aLength === bLength)
                         {
@@ -1596,50 +1909,103 @@ export default function ProductionPlannerWorker()
 
     self.getProductionBuildingFromRecipeId = function(recipeId)
     {
+        let cachedBuilding = self.buildingForRecipeCache[recipeId];
+            if(cachedBuilding !== undefined)
+            {
+                return cachedBuilding;
+            }
+
+        if(self.buildingKeyByClassName === null)
+        {
+            self.buildLookupIndexes();
+        }
+
+        let foundBuilding = null;
+
         // Find suitable building
         if(self.recipes[recipeId].mProducedIn !== undefined)
         {
             for(let i = self.recipes[recipeId].mProducedIn.length - 1; i >= 0; i--)
             {
-                let currentBuilding = self.recipes[recipeId].mProducedIn[i];
+                let currentBuilding = self.buildingKeyByClassName[self.recipes[recipeId].mProducedIn[i]];
 
-                    for(let buildingKey in self.buildings)
+                    if(currentBuilding !== undefined)
                     {
-                        if(self.buildings[buildingKey].className === currentBuilding)
-                        {
-                            return buildingKey;
-                        }
+                        foundBuilding = currentBuilding;
+                        break;
                     }
             }
         }
 
-        return null;
+        self.buildingForRecipeCache[recipeId] = foundBuilding;
+
+        return foundBuilding;
     };
 
-    self.testEdgesMaxSpeeds = function(mergingNodeData, sourceNodeData, mergedPercentage)
+    // Re-points every edge attached to fromNodeId at toNodeId, and keeps the
+    // endpoint index usable by moving the bucket across in one go.
+    self.moveIndexedEdges = function(edgeIndex, fromNodeId, toNodeId, endpoint)
     {
-        let inputQty        = {};
-            for(let k = 0; k < self.graphEdges.length; k++)
+        let movedEdges = edgeIndex[fromNodeId];
+
+            if(movedEdges === undefined)
             {
-                if(self.graphEdges[k] !== undefined)
-                {
-                    if(self.graphEdges[k].data.target === mergingNodeData.id || self.graphEdges[k].data.target === sourceNodeData.id)
+                return;
+            }
+
+            for(let k = 0; k < movedEdges.length; k++)
+            {
+                movedEdges[k].data[endpoint] = toNodeId;
+            }
+
+            if(edgeIndex[toNodeId] === undefined)
+            {
+                edgeIndex[toNodeId] = movedEdges;
+            }
+            else
+            {
+                let targetEdges = edgeIndex[toNodeId];
+
+                    for(let k = 0; k < movedEdges.length; k++)
                     {
-                        if(inputQty[self.graphEdges[k].data.itemId] === undefined)
-                        {
-                            inputQty[self.graphEdges[k].data.itemId] = 0;
-                        }
+                        targetEdges.push(movedEdges[k]);
+                    }
+            }
 
-                        inputQty[self.graphEdges[k].data.itemId] += self.graphEdges[k].data.qty * (mergedPercentage / 100);
+            delete edgeIndex[fromNodeId];
+    };
 
-                        let currentMaxMergedQty = self.options.maxBeltSpeed;
+    self.testEdgesMaxSpeeds = function(mergingNodeData, sourceNodeData, mergedPercentage, edgesByTarget)
+    {
+        let inputQty            = {};
+        let maxMergedQty        = self.options.maxBeltSpeed;
+        let incomingEdgeLists   = [edgesByTarget[mergingNodeData.id], edgesByTarget[sourceNodeData.id]];
 
-                            if(inputQty[self.graphEdges[k].data.itemId] > currentMaxMergedQty)
+            for(let l = 0; l < incomingEdgeLists.length; l++)
+            {
+                let incomingEdges = incomingEdgeLists[l];
+
+                    if(incomingEdges === undefined)
+                    {
+                        continue;
+                    }
+
+                    for(let k = 0; k < incomingEdges.length; k++)
+                    {
+                        let edgeData = incomingEdges[k].data;
+
+                            if(inputQty[edgeData.itemId] === undefined)
+                            {
+                                inputQty[edgeData.itemId] = 0;
+                            }
+
+                            inputQty[edgeData.itemId] += edgeData.qty * (mergedPercentage / 100);
+
+                            if(inputQty[edgeData.itemId] > maxMergedQty)
                             {
                                 return false;
                             }
                     }
-                }
             }
 
         return true;
