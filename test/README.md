@@ -8,8 +8,14 @@ These tests exist to keep it that way.
 `test/fixtures/referenceWorker.js` is a verbatim copy of `src/Worker.js` as it
 stood at commit `6afbc50`, before the optimization. `test/differential.test.js`
 runs it and the current `src/Worker.js` side by side over the same scenarios
-and requires them to post byte-identical results — node ids, edge quantities,
-generated HTML, required power, everything.
+and requires byte-identical results — node ids, edge quantities, required
+power, everything.
+
+The reference worker posts the three list panes as HTML strings it concatenates
+itself. The current one posts the data behind them and `lib/resultHtml.mjs`
+turns that into markup, so `runWorker.js` renders before comparing. The
+differential therefore pins the renderer as well: the HTML it produces has to
+match the reference's byte for byte.
 
 `test/runWorker.js` loads either worker into a `vm` context whose `self` is the
 context global, which is what a real WebWorker scope gives it. The worker keeps

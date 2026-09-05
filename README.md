@@ -95,8 +95,8 @@ all reversible there:
 
 The generator prints what it dropped and why on every run.
 
-Icons are sliced into one file each rather than inlined as data URIs: the worker
-builds HTML strings with `<img src="{item.image}">`, so a data URI would
+Icons are sliced into one file each rather than inlined as data URIs: the list
+panes are markup with `<img src="{item.image}">` in them, so a data URI would
 duplicate the bytes into every node of the tree. 174 icons come to ~700 KB, less
 than the 850 KB sprite they came from, and each one caches on its own.
 
@@ -118,6 +118,7 @@ npm run build-data   # regenerate public/data and public/icons
 | `src/main.jsx` | Entry point, and the whole router: `/` and `/json/<payload>`. |
 | `lib/plannerWorker.js` | Starts that worker and relays its messages. |
 | `lib/plannerState.js` | The planner's inputs, and their two shapes: the `formData` the worker expects, and the `/json/<payload>` share URL. |
+| `lib/resultHtml.mjs` | The markup for the production tree, items and buildings panes, built from what the worker posts. |
 | `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's templates. |
 | `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet the upstream page used. |
 | `scripts/buildGameData.mjs` | The FactorioLab → worker schema adapter, and the sprite slicer. |
@@ -126,8 +127,8 @@ npm run build-data   # regenerate public/data and public/icons
 Share URLs keep the upstream `/json/<url-encoded JSON>` shape, so links made by
 the original planner open here unchanged.
 
-`src/Worker.js` interpolates item names and URLs straight into the HTML it
-generates, exactly as it did upstream. That is safe because the table is
+`lib/resultHtml.mjs` interpolates item names and URLs straight into markup,
+exactly as `src/Worker.js` did upstream. That is safe because the table is
 generated here from a pinned source; it would not be safe against an arbitrary
 feed, which is one reason there is no longer an option to point it at one.
 

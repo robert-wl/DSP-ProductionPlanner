@@ -3,6 +3,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ItemPicker from './ItemPicker.jsx';
 import ProductionGraph from './ProductionGraph.jsx';
 import {startPlannerWorker} from '../lib/plannerWorker.js';
+import {renderBuildingsList, renderItemsList, renderTreeList} from '../lib/resultHtml.mjs';
 import {
     ASSEMBLER_SPEEDS,
     DEFAULT_STATE,
@@ -42,9 +43,11 @@ export default function Planner({initialPayload})
     let [workerError, setWorkerError]   = useState(null);
 
     let [power, setPower]               = useState(null);
-    let [treeHtml, setTreeHtml]         = useState('');
-    let [itemsHtml, setItemsHtml]       = useState('');
-    let [buildingsHtml, setBuildings]   = useState('');
+    // What the worker posts for the three list panes: the data behind them,
+    // not the markup. lib/resultHtml.mjs turns each into HTML below.
+    let [treeData, setTreeData]         = useState(null);
+    let [itemsData, setItemsData]       = useState(null);
+    let [buildingsData, setBuildings]   = useState(null);
     let [graph, setGraph]               = useState({nodes: null, edges: [], direction: 'RIGHT'});
 
     let [tab, setTab]                   = useState('graph');
@@ -104,9 +107,9 @@ export default function Planner({initialPayload})
 
         setWorkerError(null);
         setPower(null);
-        setTreeHtml('');
-        setItemsHtml('');
-        setBuildings('');
+        setTreeData(null);
+        setItemsData(null);
+        setBuildings(null);
 
         workerRef.current = startPlannerWorker({
             language    : currentGameData.language || 'en',
@@ -145,15 +148,15 @@ export default function Planner({initialPayload})
                         break;
 
                     case 'updateTreeList':
-                        setTreeHtml(message.html);
+                        setTreeData(message);
                         break;
 
                     case 'updateItemsList':
-                        setItemsHtml(message.html);
+                        setItemsData(message);
                         break;
 
                     case 'updateBuildingsList':
-                        setBuildings(message.html);
+                        setBuildings(message);
                         break;
 
                     case 'updateGraphNetwork':
@@ -202,10 +205,24 @@ export default function Planner({initialPayload})
         };
     }, []);
 
+    // The markup for the three list panes. The worker posts the data and this
+    // is where it becomes HTML.
+    let treeHtml = useMemo(function(){
+        return treeData === null ? '' : renderTreeList(treeData);
+    }, [treeData]);
+
+    let itemsHtml = useMemo(function(){
+        return itemsData === null ? '' : renderItemsList(itemsData);
+    }, [itemsData]);
+
+    let buildingsHtml = useMemo(function(){
+        return buildingsData === null ? '' : renderBuildingsList(buildingsData);
+    }, [buildingsData]);
+
     // Item art is sliced out of the FactorioLab sprite into public/icons at
     // build time. If one is missing, swap in the placeholder rather than
-    // leaving a broken-image glyph. Images arrive inside worker-generated
-    // HTML, so this listens on the capture phase - "error" does not bubble.
+    // leaving a broken-image glyph. Images arrive inside generated HTML, so
+    // this listens on the capture phase - "error" does not bubble.
     useEffect(function(){
         function onError(event)
         {
