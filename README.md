@@ -69,6 +69,15 @@ pinned byte for byte by the test suite, so the adapter absorbs every difference:
 | icon | `image`, a URL | a sprite offset `{x,y}` |
 | alternative recipes | `_Alternative` in the class name | `defaults.excludedRecipes` |
 
+That last row only decides the *default* now, not what the page will plan. The
+worker picks a recipe per item on its own and takes an override from the
+`altRecipes` list it is sent, so the sidebar offers every recipe for every item
+more than one recipe makes - marked alternative or not. It has to: sulfuric acid
+and organic crystal each have two ordinary recipes, and neither was reachable
+while the page only listed the `_Alternative` half of the table. The list is
+read back and written out per item by `lib/plannerState.js`, which also works
+out what the worker would have picked so the row can name it.
+
 Judgement calls it makes, all near the top of `scripts/buildGameData.mjs` and
 all reversible there:
 
