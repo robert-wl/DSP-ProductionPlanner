@@ -58,8 +58,7 @@ export default function ProductionPlannerWorker()
     self.mainNodesByItem                = {};
     self.nodesById                      = null;
     self.edgesByTargetId                = null;
-    self.hierarchyBranches              = null;
-    self.hierarchyBranchesSeen          = null;
+    self.edgesBySourceId                = null;
 
     self.numberFormat                   = null;
 
@@ -899,6 +898,12 @@ export default function ProductionPlannerWorker()
                                                 + ' ' + self.items[node.data.itemId].name;
             }
 
+            // Upstream tagged these with a buildingType while walking the
+            // production tree, and the graph carries the same node objects, so
+            // which of them ended up tagged depended on where that walk had
+            // been - by-product branches were not recursed into, so mergers
+            // only reachable through one stayed bare. Nothing ever read the
+            // field. The walk is gone and so is the tag.
             if(node.data.nodeType === 'merger')
             {
                 self.graphNodes[i].data.label   = '(' + self.items[node.data.itemId].name + ')';
@@ -1505,8 +1510,7 @@ export default function ProductionPlannerWorker()
     {
         self.nodesById                  = new Map();
         self.edgesByTargetId            = new Map();
-        self.hierarchyBranches          = {};
-        self.hierarchyBranchesSeen      = new Set();
+        self.edgesBySourceId            = new Map();
 
         for(let k = 0; k < self.graphNodes.length; k++)
         {
@@ -1526,7 +1530,9 @@ export default function ProductionPlannerWorker()
         for(let k = 0; k < self.graphEdges.length; k++)
         {
             let targetId        = self.graphEdges[k].data.target;
+            let sourceId        = self.graphEdges[k].data.source;
             let incomingEdges   = self.edgesByTargetId.get(targetId);
+            let outgoingEdges   = self.edgesBySourceId.get(sourceId);
 
                 if(incomingEdges === undefined)
                 {
@@ -1534,151 +1540,513 @@ export default function ProductionPlannerWorker()
                     self.edgesByTargetId.set(targetId, incomingEdges);
                 }
 
+                if(outgoingEdges === undefined)
+                {
+                    outgoingEdges = [];
+                    self.edgesBySourceId.set(sourceId, outgoingEdges);
+                }
+
                 incomingEdges.push(self.graphEdges[k]);
+                outgoingEdges.push(self.graphEdges[k]);
         }
     };
 
+    /**
+     * The build order.
+     *
+     * The other panes answer "what does this plan add up to". This one answers
+     * "what do I place first" - you do not build a factory from the finished
+     * item backwards, you start at the ore patch. So the graph is walked the
+     * way its edges already point, producer to consumer, and every node lands
+     * in the earliest stage that all of its inputs are ready by.
+     *
+     * Identical machines are grouped: forty-seven smelters on iron is one row
+     * with a count, not forty-seven rows. That count is the whole point of the
+     * pane - it is the number you go and place.
+     */
     self.generateTreeList = function()
     {
-        self.postMessage({type: 'updateLoaderText', text: 'Generating production list...'});
+        self.postMessage({type: 'updateLoaderText', text: 'Working out the build order...'});
         self.buildGraphIndexes();
 
-        var roots = [];
-        var requestedItemsLength = Object.keys(requestedItems).length;
+        var stages  = [];
+        var outputs = [];
 
-        if(requestedItemsLength > 0)
+        if(Object.keys(requestedItems).length > 0)
         {
-            for(let itemId in self.requestedItems)
-            {
-                let itemMainNodes   = self.mainNodesByItem[itemId];
-                let mainNodeIds     = [];
-
-                for(let k = 0; itemMainNodes !== undefined && k < itemMainNodes.length; k++)
-                {
-                    let mainNodeId = itemMainNodes[k].data.id;
-                        mainNodeIds.push(mainNodeId);
-
-                        self.collectHierarchyBranches(mainNodeId);
-                }
-
-                roots.push({
-                    image   : self.items[itemId].image,
-                    url     : self.items[itemId].url,
-                    name    : self.items[itemId].name,
-                    qty     : self.requestedItems[itemId],
-                    nodeIds : mainNodeIds
-                });
-            }
+            stages  = self.buildStages();
+            outputs = self.buildOutputList();
         }
 
         self.postMessage({
             type    : 'updateTreeList',
             locale  : self.locale,
-            roots   : roots,
-            branches: self.hierarchyBranches
+            stages  : stages,
+            outputs : outputs
         });
+    };
 
+    /** The requested items, as the goal the last stage is working towards. */
+    self.buildOutputList = function()
+    {
+        var outputs = [];
+
+        for(let itemId in self.requestedItems)
+        {
+            outputs.push({
+                itemId  : itemId,
+                image   : self.items[itemId].image,
+                url     : self.items[itemId].url,
+                name    : self.items[itemId].name,
+                qty     : self.requestedItems[itemId]
+            });
+        }
+
+        return outputs;
     };
 
     /**
-     * Records what sits under parentId, then walks into each of those in turn.
-     *
-     * The graph is a DAG, so writing the tree out as markup repeats a shared
-     * sub-tree once per path that reaches it - 3.4 blocks per node on a large
-     * plan. Keyed by parent, every level is stored once and lib/resultHtml.mjs
-     * does the expanding, in the order this walked them.
+     * Mergers and splitters are belt plumbing, not things you schedule. They
+     * are dropped from the walk and the machines on either side joined up
+     * directly, which is also what stops a long manifold from pushing the
+     * machine behind it into a stage of its own.
      */
-    self.collectHierarchyBranches = function(parentId)
+    self.isLogisticNode = function(nodeData)
     {
-        if(self.hierarchyBranchesSeen.has(parentId))
+        return nodeData.nodeType === 'merger' || nodeData.nodeType === 'splitter';
+    };
+
+    /**
+     * Whether a node is something you actually go and place.
+     *
+     * The requested item's own node is a marker for where the plan finishes,
+     * not a machine - it would otherwise show up as a stage of its own, after
+     * the machines that make it, holding nothing.
+     */
+    self.isBuildableNode = function(nodeData)
+    {
+        return self.isLogisticNode(nodeData) === false && nodeData.nodeType !== 'mainNode';
+    };
+
+    /**
+     * Stage numbers.
+     *
+     * Longest path from the sources rather than shortest, so a machine waits
+     * for its slowest input to exist: a stage never depends on a later one, and
+     * building them in order always works.
+     */
+    /**
+     * Stage numbers, worked out per group rather than per machine.
+     *
+     * Longest path from the sources rather than shortest, so a group waits for
+     * its slowest input to exist: a stage never depends on a later one, and
+     * building them in order always works.
+     *
+     * The path is measured over groups, not over individual machines, because
+     * two machines on the same recipe can sit at different depths - some gears
+     * fed by an ore chain, some by ingots you already had. Measured per machine
+     * that splits one row of gear assemblers across two stages, which is not
+     * something you would ever act on differently.
+     */
+    self.buildStages = function()
+    {
+        let keyOfNode   = new Map();    // node id -> the group it belongs to
+        let nodesOfKey  = new Map();    // group   -> [{id, data}] under it
+        let feeds       = new Map();    // group   -> the groups it feeds
+
+        for(let [nodeId, nodes] of self.nodesById)
+        {
+            if(self.isBuildableNode(nodes[0].data) === false)
+            {
+                continue;
+            }
+
+            let key     = self.stageGroupKey(nodes[0].data);
+            let members = nodesOfKey.get(key);
+
+                if(members === undefined)
+                {
+                    members = [];
+                    nodesOfKey.set(key, members);
+                    feeds.set(key, new Set());
+                }
+
+                keyOfNode.set(nodeId, key);
+
+                for(let k = 0; k < nodes.length; k++)
+                {
+                    members.push({id: nodeId, data: nodes[k].data});
+                }
+        }
+
+        for(let [nodeId, key] of keyOfNode)
+        {
+            let targets = self.realTargetsOf(nodeId);
+
+            for(let i = 0; i < targets.length; i++)
+            {
+                let targetKey = keyOfNode.get(targets[i]);
+
+                    // A group feeding itself is a machine feeding another on
+                    // the same recipe, which says nothing about ordering
+                    if(targetKey !== undefined && targetKey !== key)
+                    {
+                        feeds.get(key).add(targetKey);
+                    }
+            }
+        }
+
+        let stageOf   = new Map();
+        let remaining = new Map();
+        let queue     = [];
+
+        for(let key of nodesOfKey.keys())
+        {
+            stageOf.set(key, 0);
+            remaining.set(key, 0);
+        }
+
+        for(let [key, targets] of feeds)
+        {
+            for(let targetKey of targets)
+            {
+                remaining.set(targetKey, remaining.get(targetKey) + 1);
+            }
+        }
+
+        for(let [key, count] of remaining)
+        {
+            if(count === 0)
+            {
+                queue.push(key);
+            }
+        }
+
+        for(let i = 0; i < queue.length; i++)
+        {
+            let key = queue[i];
+
+            for(let targetKey of feeds.get(key))
+            {
+                if(stageOf.get(targetKey) < stageOf.get(key) + 1)
+                {
+                    stageOf.set(targetKey, stageOf.get(key) + 1);
+                }
+
+                remaining.set(targetKey, remaining.get(targetKey) - 1);
+
+                if(remaining.get(targetKey) === 0)
+                {
+                    queue.push(targetKey);
+                }
+            }
+        }
+
+        // Anything a cycle kept out of the queue still has to be placed, so it
+        // goes after everything that did get ordered rather than vanishing.
+        let lastStage = 0;
+
+        for(let stage of stageOf.values())
+        {
+            if(stage > lastStage)
+            {
+                lastStage = stage;
+            }
+        }
+
+        for(let [key, count] of remaining)
+        {
+            if(count > 0)
+            {
+                stageOf.set(key, lastStage + 1);
+            }
+        }
+
+        return self.buildStageList(nodesOfKey, stageOf);
+    };
+
+    /**
+     * What makes two machines the same row: the same building, on the same
+     * recipe, for the same item. Anything else is a different thing to place.
+     */
+    self.stageGroupKey = function(nodeData)
+    {
+        if(nodeData.nodeType === 'productionBuilding')
+        {
+            return 'machine|' + nodeData.buildingType + '|' + nodeData.recipe + '|' + nodeData.itemOut;
+        }
+
+        return 'item|' + nodeData.nodeType + '|' + nodeData.itemId;
+    };
+
+    /**
+     * Follows the belt plumbing out of a node until it reaches machines.
+     *
+     * A merger feeding a merger feeding a splitter is one hop as far as the
+     * build order cares. The visited set is shared across the whole walk of a
+     * node, so a manifold that fans back together is not re-walked per path.
+     */
+    self.realTargetsOf = function(nodeId)
+    {
+        let targets = [];
+        let queue   = [nodeId];
+        let seen    = new Set(queue);
+
+        for(let i = 0; i < queue.length; i++)
+        {
+            let edges = self.edgesBySourceId.get(queue[i]);
+
+                if(edges === undefined)
+                {
+                    continue;
+                }
+
+            for(let k = 0; k < edges.length; k++)
+            {
+                let targetId    = edges[k].data.target;
+                let targetNodes = self.nodesById.get(targetId);
+
+                    if(targetNodes === undefined || seen.has(targetId))
+                    {
+                        continue;
+                    }
+
+                    seen.add(targetId);
+
+                    if(self.isLogisticNode(targetNodes[0].data))
+                    {
+                        queue.push(targetId);
+                    }
+                    else if(self.isBuildableNode(targetNodes[0].data))
+                    {
+                        targets.push(targetId);
+                    }
+            }
+        }
+
+        return targets;
+    };
+
+    /**
+     * Turns the staged groups into the pane's rows.
+     *
+     * The rows a stage ends up with are what you place, so they are ordered by
+     * how many of them there are: the wall of smelters first, the single odd
+     * assembler last.
+     */
+    self.buildStageList = function(nodesOfKey, stageOf)
+    {
+        let stages = [];
+
+        for(let [key, members] of nodesOfKey)
+        {
+            let stageIndex = stageOf.get(key);
+
+                while(stages.length <= stageIndex)
+                {
+                    stages.push([]);
+                }
+
+            stages[stageIndex].push(self.buildStageGroup(members));
+        }
+
+        let built = [];
+
+        for(let i = 0; i < stages.length; i++)
+        {
+            stages[i].sort(function(a, b){
+                return b.count - a.count || a.name.localeCompare(b.name);
+            });
+
+            // A stage can empty out once its nodes are all belt plumbing
+            if(stages[i].length > 0)
+            {
+                built.push({groups: stages[i]});
+            }
+        }
+
+        return built;
+    };
+
+    self.buildStageGroup = function(members)
+    {
+        let group = (members[0].data.nodeType === 'productionBuilding')
+                  ? self.newMachineGroup(members[0].data)
+                  : self.newItemGroup(members[0].data);
+
+        let inputs = {};
+
+        for(let i = 0; i < members.length; i++)
+        {
+            let nodeData = members[i].data;
+
+                if(group.kind === 'machine')
+                {
+                    group.count += self.machineCountOf(nodeData);
+                    group.qty   += nodeData.qtyUsed;
+                    group.power += self.buildings[nodeData.buildingType].powerUsed * nodeData.performance / 100 / 1000;
+
+                    self.recordPerformance(group, nodeData);
+
+                    self.collectGroupInputs(inputs, members[i].id);
+                }
+                else
+                {
+                    // Nothing is collected for an item row: the edge arriving
+                    // at one carries the item itself, so reading it as an input
+                    // would have the row waiting on what it is.
+                    group.count++;
+                    group.qty += nodeData.neededQty;
+                }
+        }
+
+        group.count = Math.round(group.count * 10) / 10;
+        group.inputs = Object.keys(inputs).map(function(itemId){
+            return {
+                itemId  : itemId,
+                image   : self.items[itemId].image,
+                url     : self.items[itemId].url,
+                name    : self.items[itemId].name,
+                qty     : inputs[itemId]
+            };
+        }).sort(function(a, b){ return b.qty - a.qty; });
+
+        if(group.partial !== undefined)
+        {
+            group.partial.sort(function(a, b){ return b.performance - a.performance; });
+        }
+
+        return group;
+    };
+
+    /**
+     * How many machines a node stands for.
+     *
+     * One, in the realistic view - a node is a machine there, and running at
+     * 40% does not make it less of a machine to place. The simple view packs a
+     * whole recipe into one node instead and carries the count in `performance`
+     * as a percentage, which is where the fractional counts come from.
+     */
+    self.machineCountOf = function(nodeData)
+    {
+        return (self.options.viewMode === 'SIMPLE') ? (nodeData.performance / 100) : 1;
+    };
+
+    /**
+     * Twenty-seven smelters all held to 75% by the same belt is one fact, not
+     * twenty-seven, so equal percentages are counted together rather than
+     * listed one per machine. The simple view has no machines to be short of,
+     * so it has nothing to record.
+     */
+    self.recordPerformance = function(group, nodeData)
+    {
+        if(self.options.viewMode === 'SIMPLE')
         {
             return;
         }
 
-        // Also guards against a cycle sending the recursion infinite
-        self.hierarchyBranchesSeen.add(parentId);
+        if(nodeData.performance >= 100)
+        {
+            group.full++;
 
-        // Build current parentId childrens
-        var children = self.edgesByTargetId.get(parentId);
-            if(children === undefined)
+            return;
+        }
+
+        let bucket = group.partial.find(function(entry){
+            return entry.performance === nodeData.performance;
+        });
+
+            if(bucket === undefined)
+            {
+                group.partial.push({performance: nodeData.performance, count: 1});
+            }
+            else
+            {
+                bucket.count++;
+            }
+    };
+
+    self.newMachineGroup = function(nodeData)
+    {
+        let building = self.buildings[nodeData.buildingType];
+        let produced = self.items[nodeData.itemOut];
+
+        return {
+            kind        : 'machine',
+            buildingId  : nodeData.buildingType,
+            image       : building.image,
+            url         : building.url,
+            name        : building.name,
+            recipe      : (self.recipes[nodeData.recipe] === undefined) ? null : self.recipes[nodeData.recipe].name,
+            produces    : {
+                itemId  : nodeData.itemOut,
+                image   : produced.image,
+                url     : produced.url,
+                name    : produced.name
+            },
+            count       : 0,
+            qty         : 0,
+            power       : 0,
+            full        : 0,
+            partial     : [],
+            inputs      : []
+        };
+    };
+
+    /**
+     * An item the plan does not build a chain for: something you said you
+     * already produce, a by-product it recovered, or an ore the walk stopped
+     * at. Either way it is a belt arriving from outside, not a machine.
+     */
+    self.newItemGroup = function(nodeData)
+    {
+        let item = self.items[nodeData.itemId];
+
+        return {
+            kind    : (self.inputItems[nodeData.itemId] === undefined) ? 'byproduct' : 'supplied',
+            itemId  : nodeData.itemId,
+            image   : item.image,
+            url     : item.url,
+            name    : item.name,
+            count   : 0,
+            qty     : 0,
+            inputs  : []
+        };
+    };
+
+    /**
+     * What a group eats, per minute.
+     *
+     * Taken from the edges arriving at the node rather than from the recipe:
+     * the edge quantities are what the plan actually routes, so a machine held
+     * back by a slow belt reports the belt's number and not the recipe's.
+     */
+    self.collectGroupInputs = function(inputs, nodeId)
+    {
+        let edges = self.edgesByTargetId.get(nodeId);
+
+            if(edges === undefined)
             {
                 return;
             }
 
-        var branch = [];
-
-        for(let i = 0; i < children.length; i++)
+        for(let i = 0; i < edges.length; i++)
         {
-            let childNodes = self.nodesById.get(children[i].data.source);
+            let itemId = edges[i].data.itemId;
 
-            for(let k = 0; childNodes !== undefined && k < childNodes.length; k++)
-            {
-                let childNode = childNodes[k];
-                let block;
+                if(self.items[itemId] === undefined)
+                {
+                    continue;
+                }
 
-                    if(childNode.data.nodeType === 'lastNodeItem' || childNode.data.nodeType === 'byProductItem')
-                    {
-                        block = {
-                            kind    : 'item',
-                            image   : self.items[childNode.data.itemId].image,
-                            name    : self.items[childNode.data.itemId].name,
-                            url     : self.items[childNode.data.itemId].url,
-                            qty     : childNode.data.neededQty
-                        };
-                    }
-                    else
-                    {
-                        // Upstream tagged the node itself rather than resolving
-                        // the building locally. Kept, because the tagged nodes
-                        // go out with the graph - so this is the one thing the
-                        // panes are not independent about, and the graph pane
-                        // must not come to depend on it.
-                        if(childNode.data.nodeType === 'merger')
-                        {
-                            childNode.data.buildingType = 'ConveyorBeltMk1';
-                        }
-                        if(childNode.data.nodeType === 'splitter')
-                        {
-                            childNode.data.buildingType = 'Splitter';
-                        }
-
-                        block = {
-                            kind    : 'building',
-                            image   : self.buildings[childNode.data.buildingType].image,
-                            name    : self.buildings[childNode.data.buildingType].name,
-                            url     : self.buildings[childNode.data.buildingType].url,
-                            label   : children[i].data.label
-                        };
-
-                        if(childNode.data.nodeType === 'productionBuilding')
-                        {
-                            block.performance       = childNode.data.performance;
-                            block.performanceColor  = childNode.data.performanceColor;
-                        }
-                    }
-
-                    // Left off by-products, which are where the walk stops
-                    if(childNode.data.nodeType !== 'byProductItem')
-                    {
-                        block.id = childNode.data.id;
-                    }
-
-                    branch.push(block);
-
-                    //break; // Don't break as not merged belt can have more than one input...
-            }
-        }
-
-        self.hierarchyBranches[parentId] = branch;
-
-        // Recursed once the level is recorded, so the order a parent is first
-        // reached in is the order the markup nests them in
-        for(let i = 0; i < branch.length; i++)
-        {
-            if(branch[i].id !== undefined)
-            {
-                self.collectHierarchyBranches(branch[i].id);
-            }
+                if(inputs[itemId] === undefined)
+                {
+                    inputs[itemId] = edges[i].data.qty;
+                }
+                else
+                {
+                    inputs[itemId] += edges[i].data.qty;
+                }
         }
     };
 

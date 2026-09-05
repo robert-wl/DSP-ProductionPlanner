@@ -16,16 +16,62 @@ const path = require('path');
 const vm   = require('vm');
 
 const gameData = require('./fixtures/gameData.js');
-const {renderTreeList, renderItemsList, renderBuildingsList} = require('../lib/resultHtml.mjs');
+const {renderItemsList, renderBuildingsList} = require('../lib/resultHtml.mjs');
 
 const CURRENT_WORKER   = path.join(__dirname, '..', 'src', 'Worker.js');
 const REFERENCE_WORKER = path.join(__dirname, 'fixtures', 'referenceWorker.js');
 
 const LIST_RENDERERS = {
-    updateTreeList      : renderTreeList,
     updateItemsList     : renderItemsList,
     updateBuildingsList : renderBuildingsList
 };
+
+/**
+ * The production tree pane is deliberately not the reference's any more.
+ *
+ * Upstream listed the plan backwards from the finished item; components/
+ * BuildOrder.jsx lists it forwards from the ore, grouped and staged, which is
+ * a different answer to a different question rather than the same markup moved
+ * around. Comparing it to the reference would only ever pin the redesign shut.
+ *
+ * Nothing about the calculation goes unwatched by leaving it out: the pane is
+ * derived from the graph, and the graph, the power figure, the items list and
+ * the buildings list are all still compared message for message. Its own shape
+ * is pinned by test/buildOrder.test.js instead.
+ */
+const REDESIGNED = new Set(['updateTreeList']);
+
+/**
+ * Drops the buildingType the reference leaks onto belt plumbing.
+ *
+ * Upstream tagged merger and splitter nodes while walking the production tree,
+ * and the graph message carries those same node objects - so the field landed
+ * on whichever ones that walk happened to reach, which was not all of them:
+ * by-product branches were never recursed into. Nothing read it. The build
+ * order does not walk the graph that way, so the current worker does not set
+ * it at all, and comparing it would pin an artifact rather than the plan.
+ */
+function stripTreeWalkTag(message)
+{
+    if(message.type !== 'updateGraphNetwork')
+    {
+        return message;
+    }
+
+    return Object.assign({}, message, {
+        nodes: message.nodes.map(function(node){
+            if(node.data.nodeType !== 'merger' && node.data.nodeType !== 'splitter')
+            {
+                return node;
+            }
+
+            let data = Object.assign({}, node.data);
+                delete data.buildingType;
+
+            return {data: data};
+        })
+    });
+}
 
 /**
  * Instantiates a worker and returns its global scope, so tests can either
@@ -90,15 +136,17 @@ function runScenario(workerSourcePath, scenario)
  * tripping through JSON both flattens them into plain host objects and mirrors
  * what postMessage would hand to the page anyway.
  *
- * The reference worker posts the three list panes as HTML. The current one
- * posts the data behind them and leaves the markup to lib/resultHtml.mjs, so
- * that runs here too: the differential then compares like with like, and pins
- * the renderer as well as the calculation.
+ * The reference worker posts the list panes as HTML. The current one posts the
+ * data behind them and leaves the markup to lib/resultHtml.mjs, so that runs
+ * here too: the differential then compares like with like, and pins the
+ * renderer as well as the calculation.
  */
 function outputOf(workerSourcePath, scenario)
 {
     let messages = runScenario(workerSourcePath, scenario).messages.filter(function(message){
-        return message.type !== 'updateLoaderText' && message.type !== 'showLoader';
+        return message.type !== 'updateLoaderText'
+            && message.type !== 'showLoader'
+            && REDESIGNED.has(message.type) === false;
     });
 
     return JSON.parse(JSON.stringify(messages)).map(function(message){
@@ -111,7 +159,7 @@ function outputOf(workerSourcePath, scenario)
             }
 
         return {type: message.type, html: render(message)};
-    });
+    }).map(stripTreeWalkTag);
 }
 
 module.exports = {loadWorker, runScenario, outputOf, CURRENT_WORKER, REFERENCE_WORKER};

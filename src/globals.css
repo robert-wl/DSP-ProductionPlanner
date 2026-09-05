@@ -524,30 +524,6 @@ input:focus-visible, select:focus-visible, button:focus-visible {
 .workerHtml .text-center{ text-align: center; }
 .workerHtml .align-middle { vertical-align: middle; }
 
-.workerHtml .row {
-    display     : flex;
-    flex-wrap   : wrap;
-    margin      : 0 -8px;
-}
-
-.workerHtml .col-sm-6 {
-    flex        : 0 0 100%;
-    max-width   : 100%;
-    padding     : 0 8px;
-    min-width   : 0;
-}
-
-@media (min-width: 900px) {
-    .workerHtml .col-sm-6 { flex: 0 0 50%; max-width: 50%; }
-}
-
-.workerHtml .media {
-    display     : flex;
-    align-items : flex-start;
-}
-
-.workerHtml .media-body { flex: 1; min-width: 0; }
-
 .workerHtml .table {
     width           : 100%;
     border-collapse : collapse;
@@ -588,38 +564,188 @@ input:focus-visible, select:focus-visible, button:focus-visible {
 
 .workerHtml .list-group-flush .list-group-item:last-child { border-bottom: none; }
 
-/* Production tree */
+/* Build order ------------------------------------------------------------ */
 
-.workerHtml .hierarchyTree { font-size: 13px; }
-
-.workerHtml .hierarchyTree .root > .child {
-    padding-left    : 0;
-    border-left     : none;
+.buildOrder {
+    padding : 16px;
 }
 
-.workerHtml .hierarchyTree .child {
-    position    : relative;
-    padding     : 3px 0;
+.buildOrderEmpty {
+    padding     : 24px 16px;
+    margin      : 0;
+    text-align  : center;
 }
 
-.workerHtml .hierarchyTree .parent {
-    margin-left     : 19px;
-    padding-left    : 18px;
-    border-left     : 1px solid var(--line);
+.buildStages {
+    list-style  : none;
+    margin      : 0;
+    padding     : 0;
+    display     : flex;
+    flex-direction : column;
+    gap         : 14px;
 }
 
-.workerHtml .hierarchyTree .parent > .child::before {
-    content         : "";
-    position        : absolute;
-    left            : -18px;
-    top             : 22px;
-    width           : 14px;
-    border-top      : 1px solid var(--line);
+.buildStage {
+    border          : 1px solid var(--line);
+    border-radius   : var(--radius);
+    background      : var(--panel);
+    overflow        : hidden;
 }
 
-.workerHtml .hierarchyTree .media { align-items: center; }
-.workerHtml .hierarchyTree .collapseChildren { cursor: pointer; }
-.workerHtml .hierarchyTree small { color: var(--muted); }
+.buildStageHead {
+    display         : flex;
+    align-items     : center;
+    gap             : 10px;
+    padding         : 10px 14px;
+    background      : var(--panel-alt);
+    border-bottom   : 1px solid var(--line);
+}
+
+.buildStageNumber {
+    display         : grid;
+    place-items     : center;
+    width           : 22px;
+    height          : 22px;
+    flex            : 0 0 22px;
+    border-radius   : 50%;
+    background      : var(--accent-soft);
+    color           : var(--accent);
+    font-size       : 12px;
+    font-weight     : 700;
+}
+
+.buildStageHead h3 {
+    margin      : 0;
+    font-size   : 13px;
+    font-weight : 600;
+    letter-spacing : .02em;
+}
+
+.buildStageSummary {
+    margin-left : auto;
+    font-size   : 12px;
+}
+
+.buildGroups {
+    list-style  : none;
+    margin      : 0;
+    padding     : 0;
+}
+
+.buildGroup {
+    display         : flex;
+    gap             : 12px;
+    padding         : 11px 14px;
+    border-bottom   : 1px solid var(--line-soft);
+}
+
+.buildGroup:last-child  { border-bottom: none; }
+.buildGroup.supply      { background: rgba(255, 255, 255, .018); }
+
+.buildGroupIcon {
+    width       : 34px;
+    height      : 34px;
+    flex        : 0 0 34px;
+    object-fit  : contain;
+}
+
+.buildGroupBody { flex: 1; min-width: 0; }
+
+.buildGroupTitle {
+    margin      : 0;
+    font-size   : 13.5px;
+}
+
+/* The number you go and place, so it is the thing the eye lands on */
+.buildCount {
+    display         : inline-block;
+    min-width       : 42px;
+    margin-right    : 8px;
+    font-size       : 16px;
+    font-variant-numeric : tabular-nums;
+    color           : var(--text);
+}
+
+.buildTag {
+    display         : inline-block;
+    margin-right    : 8px;
+    padding         : 1px 7px;
+    border-radius   : 999px;
+    background      : var(--warn-soft);
+    border          : 1px solid rgba(240, 180, 41, .35);
+    color           : var(--warn);
+    font-size       : 10.5px;
+    text-transform  : uppercase;
+    letter-spacing  : .06em;
+}
+
+.buildGroupRate {
+    margin      : 2px 0 0 50px;
+    font-size   : 12.5px;
+    font-variant-numeric : tabular-nums;
+}
+
+.buildPerformance {
+    margin-left : 8px;
+    color       : var(--warn);
+}
+
+.buildInputs {
+    display     : flex;
+    flex-wrap   : wrap;
+    align-items : center;
+    gap         : 6px;
+    margin      : 6px 0 0 50px;
+    font-size   : 12px;
+}
+
+.buildInput {
+    display         : inline-flex;
+    align-items     : center;
+    gap             : 5px;
+    padding         : 2px 8px 2px 4px;
+    border          : 1px solid var(--line);
+    border-radius   : 999px;
+    background      : var(--bg-elevated);
+    font-variant-numeric : tabular-nums;
+}
+
+.buildInput img { width: 16px; height: 16px; object-fit: contain; }
+
+.buildGroup.supply .buildGroupRate { margin-left: 0; }
+
+.buildGoal {
+    margin-top      : 14px;
+    padding         : 12px 14px;
+    border          : 1px solid rgba(77, 163, 255, .4);
+    border-radius   : var(--radius);
+    background      : var(--accent-soft);
+}
+
+.buildGoalLabel {
+    font-size       : 11px;
+    text-transform  : uppercase;
+    letter-spacing  : .07em;
+}
+
+.buildGoalItems {
+    list-style  : none;
+    margin      : 6px 0 0;
+    padding     : 0;
+    display     : flex;
+    flex-wrap   : wrap;
+    gap         : 8px 18px;
+}
+
+.buildGoalItems li {
+    display     : flex;
+    align-items : center;
+    gap         : 6px;
+    font-size   : 13.5px;
+    font-variant-numeric : tabular-nums;
+}
+
+.buildGoalItems img { width: 22px; height: 22px; object-fit: contain; }
 
 /* Responsive -------------------------------------------------------------- */
 
