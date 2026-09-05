@@ -40,7 +40,7 @@ export default function ProductionGraph({nodes, edges, direction, onLayoutDone})
 
             graphRef.current = cytoscape({
                 container           : containerRef.current,
-                wheelSensitivity    : 0.05,
+                wheelSensitivity    : 0.25,
                 layout              : undefined,
                 elements            : {nodes: [], edges: []},
                 style               : [
