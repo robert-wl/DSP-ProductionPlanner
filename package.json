@@ -1,6 +1,6 @@
 {
     "name": "DSPCPP-build",
-    "author": "AnthorNet",
+    "author": "robert-wl",
     "description": "DSPCPP webpack builder.",
     "version": "1.0.0",
     "private": true,
@@ -12,6 +12,10 @@
     },
     "scripts": {
         "build-SCIM": "webpack"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/robert-wl/DSP-ProductionPlanner.git"
     },
     "main": "webpack.config.js",
     "keywords": [],
