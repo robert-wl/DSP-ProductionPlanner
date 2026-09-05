@@ -2,6 +2,10 @@
 
 export default function ProductionPlannerWorker()
 {
+    // In the order the page's tabs are in, which is the order the results were
+    // posted in back when every run built all four.
+    const ALL_PANES = ['tree', 'items', 'buildings', 'graph'];
+
     self.url            = {};
 
     self.debug          = false;
@@ -29,6 +33,8 @@ export default function ProductionPlannerWorker()
     self.listItems      = {};
     self.listBuildings  = {};
 
+    self.panes          = ALL_PANES;
+
     self.nodeIdKey      = 0;
     self.graphNodes     = [];
     self.graphEdges     = [];
@@ -52,11 +58,23 @@ export default function ProductionPlannerWorker()
     self.mainNodesByItem                = {};
     self.nodesById                      = null;
     self.edgesByTargetId                = null;
-    self.hierarchyTreeCache             = null;
+    self.hierarchyBranches              = null;
+    self.hierarchyBranchesSeen          = null;
 
     self.numberFormat                   = null;
 
     self.onmessage = function(e) {
+        // A pane the page has since opened. The calculation is still here, so
+        // this only builds the one result that was asked for.
+        if(e.data.type === 'requestPanes')
+        {
+            self.postMessage({type: 'showLoader'});
+            self.generatePanes(e.data.panes);
+            self.postMessage({type: 'done'});
+
+            return;
+        }
+
         self.postMessage({type: 'showLoader'});
 
         // Add default
@@ -68,7 +86,35 @@ export default function ProductionPlannerWorker()
         self.items          = Object.assign({}, e.data.items, e.data.buildings);
         self.recipes        = e.data.recipes;
 
+        // Which results to build once the calculation is done. Everything,
+        // unless the page says otherwise - the differential test suite drives
+        // this worker without one and expects the full set.
+        self.panes          = (e.data.panes === undefined) ? ALL_PANES : e.data.panes;
+
         self.prepareOptions(e.data.formData);
+    };
+
+    self.generatePanes = function(panes)
+    {
+        for(let i = 0; i < panes.length; i++)
+        {
+            if(panes[i] === 'tree')
+            {
+                self.generateTreeList();
+            }
+            else if(panes[i] === 'items')
+            {
+                self.generateItemsList();
+            }
+            else if(panes[i] === 'buildings')
+            {
+                self.generateBuildingList();
+            }
+            else if(panes[i] === 'graph')
+            {
+                self.generateGraphNetwork();
+            }
+        }
     };
 
     // Intl.NumberFormat construction is expensive, and the lists below format
@@ -1004,7 +1050,9 @@ export default function ProductionPlannerWorker()
 
         self.postMessage({type: 'updateRequiredPower', power: self.requiredPower});
 
-        self.generateTreeList();
+        self.generatePanes(self.panes);
+
+        self.postMessage({type: 'done'});
     };
 
     self.startMainNode = function(itemKey, mainRequiredQty) {
@@ -1455,9 +1503,10 @@ export default function ProductionPlannerWorker()
     // edge at each level. Index the (now final) graph once instead.
     self.buildGraphIndexes = function()
     {
-        self.nodesById          = new Map();
-        self.edgesByTargetId    = new Map();
-        self.hierarchyTreeCache = new Map();
+        self.nodesById                  = new Map();
+        self.edgesByTargetId            = new Map();
+        self.hierarchyBranches          = {};
+        self.hierarchyBranchesSeen      = new Set();
 
         for(let k = 0; k < self.graphNodes.length; k++)
         {
@@ -1493,219 +1542,188 @@ export default function ProductionPlannerWorker()
     {
         self.postMessage({type: 'updateLoaderText', text: 'Generating production list...'});
         self.buildGraphIndexes();
-        var html = [];
+
+        var roots = [];
         var requestedItemsLength = Object.keys(requestedItems).length;
 
-        if(requestedItemsLength === 0)
+        if(requestedItemsLength > 0)
         {
-            html.push('<p class="p-3 text-center">Please select at least one item in the production list.</p>');
-        }
-        else
-        {
-            html.push('<div class="row">');
-
             for(let itemId in self.requestedItems)
             {
-                if(requestedItemsLength >= 1)
+                let itemMainNodes   = self.mainNodesByItem[itemId];
+                let mainNodeIds     = [];
+
+                for(let k = 0; itemMainNodes !== undefined && k < itemMainNodes.length; k++)
                 {
-                    html.push('<div class="col-sm-6">');
+                    let mainNodeId = itemMainNodes[k].data.id;
+                        mainNodeIds.push(mainNodeId);
+
+                        self.collectHierarchyBranches(mainNodeId);
                 }
-                else
-                {
-                    html.push('<div>');
-                }
 
-                    html.push('<div class="p-3">');
-                        html.push('<div class="hierarchyTree">');
-                            html.push('<div class="root">');
-                                html.push('<div class="child">');
-                                    html.push('<img src="' + self.items[itemId].image + '" style="width: 40px;" class="mr-3" />');
-                                    html.push(self.formatNumber(self.requestedItems[itemId]) + 'x ');
-                                    html.push('<a href="' + self.items[itemId].url + '"style="line-height: 40px;">' + self.items[itemId].name + '</a>');
-
-                                    let itemMainNodes = self.mainNodesByItem[itemId];
-
-                                    for(let k = 0; itemMainNodes !== undefined && k < itemMainNodes.length; k++)
-                                    {
-                                        html.push(self.buildHierarchyTree(itemMainNodes[k].data.id));
-                                    }
-
-                                html.push('</div>');
-                            html.push('</div>');
-                        html.push('</div>');
-                    html.push('</div>');
-                html.push('</div>');
+                roots.push({
+                    image   : self.items[itemId].image,
+                    url     : self.items[itemId].url,
+                    name    : self.items[itemId].name,
+                    qty     : self.requestedItems[itemId],
+                    nodeIds : mainNodeIds
+                });
             }
-
-            html.push('</div>');
         }
 
-        self.postMessage({type: 'updateTreeList', html: html.join('')});
-        self.generateItemsList();
+        self.postMessage({
+            type    : 'updateTreeList',
+            locale  : self.locale,
+            roots   : roots,
+            branches: self.hierarchyBranches
+        });
+
     };
 
-    self.buildHierarchyTree = function(parentId)
+    /**
+     * Records what sits under parentId, then walks into each of those in turn.
+     *
+     * The graph is a DAG, so writing the tree out as markup repeats a shared
+     * sub-tree once per path that reaches it - 3.4 blocks per node on a large
+     * plan. Keyed by parent, every level is stored once and lib/resultHtml.mjs
+     * does the expanding, in the order this walked them.
+     */
+    self.collectHierarchyBranches = function(parentId)
     {
-        let cachedHtml = self.hierarchyTreeCache.get(parentId);
-            if(cachedHtml !== undefined)
-            {
-                return cachedHtml;
-            }
+        if(self.hierarchyBranchesSeen.has(parentId))
+        {
+            return;
+        }
 
-            // Also guards against a cycle sending the recursion infinite
-            self.hierarchyTreeCache.set(parentId, '');
-
-        var html = [];
+        // Also guards against a cycle sending the recursion infinite
+        self.hierarchyBranchesSeen.add(parentId);
 
         // Build current parentId childrens
         var children = self.edgesByTargetId.get(parentId);
             if(children === undefined)
             {
-                children = [];
+                return;
             }
 
-        if(children.length > 0)
+        var branch = [];
+
+        for(let i = 0; i < children.length; i++)
         {
-            html.push('<div class="parent">');
+            let childNodes = self.nodesById.get(children[i].data.source);
 
-            for(let i = 0; i < children.length; i++)
+            for(let k = 0; childNodes !== undefined && k < childNodes.length; k++)
             {
-                let childNodes = self.nodesById.get(children[i].data.source);
+                let childNode = childNodes[k];
+                let block;
 
-                for(let k = 0; childNodes !== undefined && k < childNodes.length; k++)
-                {
-                    let childNode = childNodes[k];
+                    if(childNode.data.nodeType === 'lastNodeItem' || childNode.data.nodeType === 'byProductItem')
+                    {
+                        block = {
+                            kind    : 'item',
+                            image   : self.items[childNode.data.itemId].image,
+                            name    : self.items[childNode.data.itemId].name,
+                            url     : self.items[childNode.data.itemId].url,
+                            qty     : childNode.data.neededQty
+                        };
+                    }
+                    else
+                    {
+                        // Upstream tagged the node itself rather than resolving
+                        // the building locally. Kept, because the tagged nodes
+                        // go out with the graph - so this is the one thing the
+                        // panes are not independent about, and the graph pane
+                        // must not come to depend on it.
+                        if(childNode.data.nodeType === 'merger')
+                        {
+                            childNode.data.buildingType = 'ConveyorBeltMk1';
+                        }
+                        if(childNode.data.nodeType === 'splitter')
+                        {
+                            childNode.data.buildingType = 'Splitter';
+                        }
 
-                        html.push('<div class="child">');
+                        block = {
+                            kind    : 'building',
+                            image   : self.buildings[childNode.data.buildingType].image,
+                            name    : self.buildings[childNode.data.buildingType].name,
+                            url     : self.buildings[childNode.data.buildingType].url,
+                            label   : children[i].data.label
+                        };
 
-                            html.push('<div class="media">');
+                        if(childNode.data.nodeType === 'productionBuilding')
+                        {
+                            block.performance       = childNode.data.performance;
+                            block.performanceColor  = childNode.data.performanceColor;
+                        }
+                    }
 
-                            if(childNode.data.nodeType === 'lastNodeItem' || childNode.data.nodeType === 'byProductItem')
-                            {
-                                html.push('<img src="' + self.items[childNode.data.itemId].image + '" alt="' + self.items[childNode.data.itemId].name + '" style="width: 40px;" class="mr-3" />');
+                    // Left off by-products, which are where the walk stops
+                    if(childNode.data.nodeType !== 'byProductItem')
+                    {
+                        block.id = childNode.data.id;
+                    }
 
-                                html.push('<div class="media-body">');
-                                    html.push(self.formatNumber(childNode.data.neededQty) + 'x ');
-                                    html.push('<a href="' + self.items[childNode.data.itemId].url + '" style="line-height: 40px;">' + self.items[childNode.data.itemId].name + '</a>');
-                                html.push('</div>');
-                            }
-                            else
-                            {
-                                if(childNode.data.nodeType === 'merger')
-                                {
-                                    childNode.data.buildingType = 'ConveyorBeltMk1';
-                                }
-                                if(childNode.data.nodeType === 'splitter')
-                                {
-                                    childNode.data.buildingType = 'Splitter';
-                                }
+                    branch.push(block);
 
-                                html.push('<img src="' + self.buildings[childNode.data.buildingType].image + '" alt="' + self.buildings[childNode.data.buildingType].name + '" style="width: 40px;" class="mr-3 collapseChildren" />');
-
-                                html.push('<div class="media-body">');
-                                    html.push('<a href="' + self.buildings[childNode.data.buildingType].url + '">' + self.buildings[childNode.data.buildingType].name + '</a>');
-
-                                    if(childNode.data.nodeType === 'productionBuilding')
-                                    {
-                                        //html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + k + ')</em>'); // DEBUG
-                                        html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + childNode.data.performance + '%)</em>');
-                                        //html.push(' <em style="color: ' + childNode.data.performanceColor + '">(' + childNode.data.qtyUsed + ' / ' + childNode.data.qtyProduced + ')</em>'); // DEBUG
-                                    }
-
-                                    html.push('<br />');
-                                    html.push('<small>' + children[i].data.label + '</small>');
-                                html.push('</div>');
-                            }
-
-                            html.push('</div>');
-
-                            if(childNode.data.nodeType !== 'byProductItem')
-                            {
-                                html.push(self.buildHierarchyTree(childNode.data.id));
-                            }
-
-                        html.push('</div>');
-
-                        //break; // Don't break as not merged belt can have more than one input...
-                }
+                    //break; // Don't break as not merged belt can have more than one input...
             }
-
-            html.push('</div>');
         }
 
-        let renderedHtml = html.join('');
-            self.hierarchyTreeCache.set(parentId, renderedHtml);
+        self.hierarchyBranches[parentId] = branch;
 
-        return renderedHtml;
+        // Recursed once the level is recorded, so the order a parent is first
+        // reached in is the order the markup nests them in
+        for(let i = 0; i < branch.length; i++)
+        {
+            if(branch[i].id !== undefined)
+            {
+                self.collectHierarchyBranches(branch[i].id);
+            }
+        }
     };
 
     self.generateItemsList = function()
     {
         self.postMessage({type: 'updateLoaderText', text: 'Generating items list...'});
-        var html = [];
+        var items = [];
         var listItemsLength = Object.keys(self.listItems).length;
 
-        if(listItemsLength === 0)
-        {
-            html.push('<p class="p-3 text-center">Please select at least one item in the production list.</p>');
-        }
-        else
+        if(listItemsLength > 0)
         {
             var reversedKeys = Object.keys(self.listItems).reverse();
-
-            html.push('<table class="table table-striped mb-0">');
-
-            html.push('<thead>');
-                html.push('<tr>');
-                    html.push('<th></th>');
-                    html.push('<th>Needed per minute</th>');
-                html.push('</tr>');
-            html.push('</thead>');
-
-            html.push('<tbody>');
 
             for(let i = 0; i < reversedKeys.length; i++)
             {
                 var itemId  = reversedKeys[i];
 
-                html.push('<tr>');
-                    html.push('<td width="40"><img src="' + self.items[itemId].image + '" style="width: 40px;" /></td>');
-                    html.push('<td class="align-middle">');
-                        html.push(self.formatNumber(self.listItems[itemId]) + ' units/min of ');
-                        html.push('<a href="' + self.items[itemId].url + '">' + self.items[itemId].name + '</a>');
-                   html.push('</td>');
-                html.push('</tr>');
+                items.push({
+                    image   : self.items[itemId].image,
+                    url     : self.items[itemId].url,
+                    name    : self.items[itemId].name,
+                    qty     : self.listItems[itemId]
+                });
             }
-
-            html.push('</tbody>');
-            html.push('</table>');
         }
 
-        self.postMessage({type: 'updateItemsList', html: html.join('')});
-        self.generateBuildingList();
+        self.postMessage({type: 'updateItemsList', locale: self.locale, items: items});
     };
 
     self.generateBuildingList = function()
     {
         self.postMessage({type: 'updateLoaderText', text: 'Generating buildings list...'});
-        var html = [];
+        var buildings = [];
+        var totals = [];
         var buildingsListRecipe = {};
         var listBuildingsLength = Object.keys(self.listBuildings).length;
 
-        if(listBuildingsLength === 0)
-        {
-            html.push('<p class="p-3 text-center">Please select at least one item in the production list.</p>');
-        }
-        else
+        if(listBuildingsLength > 0)
         {
             var reversedKeys = Object.keys(self.listBuildings).reverse();
-
-            html.push('<table class="table table-striped mb-0">');
 
             for(let i = 0; i < reversedKeys.length; i++)
             {
                 let buildingId          = reversedKeys[i];
-                let currentRecipe       = null;
+                let currentRecipe       = [];
                 let buildingClassName   = self.buildings[buildingId].className.replace(/Build_/g, 'Desc_');
 
                 // Build recipe...
@@ -1713,99 +1731,65 @@ export default function ProductionPlannerWorker()
 
                 if(recipeId !== undefined)
                 {
-                    currentRecipe = [];
-
                     for(let ingredient in self.recipes[recipeId].ingredients)
                     {
                         let itemId = self.getItemIdFromClassName(ingredient);
 
                             if(itemId !== null)
                             {
+                                let recipeQty = self.listBuildings[buildingId] * self.recipes[recipeId].ingredients[ingredient];
+
                                 currentRecipe.push({
-                                    id      : itemId,
                                     name    : self.items[itemId].name,
                                     image   : self.items[itemId].image,
-                                    qty     : self.recipes[recipeId].ingredients[ingredient]
+                                    qty     : recipeQty
                                 });
+
+                                if(buildingsListRecipe[itemId] === undefined)
+                                {
+                                    buildingsListRecipe[itemId] = recipeQty;
+                                }
+                                else
+                                {
+                                    buildingsListRecipe[itemId] += recipeQty;
+                                }
                             }
                     }
                 }
 
-                html.push('<tr>');
-                html.push('<td width="40" class="align-middle"><img src="' + self.buildings[buildingId].image + '" style="width: 40px;" /></td>');
-
-                html.push('<td class="align-middle">');
-                    html.push(self.formatNumber(self.listBuildings[buildingId]) + 'x ');
-                    html.push('<a href="' + self.buildings[buildingId].url + '">' + self.buildings[buildingId].name + '</a>');
-                html.push('</td>');
-
-                html.push('<td class="align-middle">');
-
-                    var toJoin = [];
-
-                    if(currentRecipe !== null)
-                    {
-                        for(let j = 0; j < currentRecipe.length; j++)
-                        {
-                            var recipeQty = self.listBuildings[buildingId] * currentRecipe[j].qty;
-                            var temp = [];
-                                temp.push(self.formatNumber(recipeQty) + 'x ');
-                                temp.push('<img src="' + currentRecipe[j].image + '" title="' + currentRecipe[j].name + '" style="width: 24px;" />');
-
-                            if(buildingsListRecipe[currentRecipe[j].id] === undefined)
-                            {
-                                buildingsListRecipe[currentRecipe[j].id] = recipeQty;
-                            }
-                            else
-                            {
-                                buildingsListRecipe[currentRecipe[j].id] += recipeQty;
-                            }
-
-                            toJoin.push(temp.join(''));
-                        }
-                    }
-
-                    html.push(toJoin.join(', '));
-
-                html.push('</td>');
-
-                html.push('</tr>');
+                buildings.push({
+                    image   : self.buildings[buildingId].image,
+                    url     : self.buildings[buildingId].url,
+                    name    : self.buildings[buildingId].name,
+                    count   : self.listBuildings[buildingId],
+                    recipe  : currentRecipe
+                });
             }
 
-            html.push('<tr>');
-            html.push('<td></td>');
-            html.push('<td><strong>Total:</strong></td>');
-            html.push('<td class="p-0"><ul class="list-group list-group-flush">');
-
-                for(let idRecipe in buildingsListRecipe)
-                {
-                    html.push('<li class="list-group-item">');
-
-                    html.push(self.formatNumber(buildingsListRecipe[idRecipe]) + 'x ');
+            for(let idRecipe in buildingsListRecipe)
+            {
+                let total = {id: idRecipe, qty: buildingsListRecipe[idRecipe]};
 
                     if(self.items[idRecipe] !== undefined)
                     {
-                        html.push('<img src="' + self.items[idRecipe].image + '" title="' + self.items[idRecipe].name + '" style="width: 24px;" /> ');
-                        html.push('<a href="' + self.items[idRecipe].url + '">' + self.items[idRecipe].name + '</a>');
-                    }
-                    else
-                    {
-                        html.push(idRecipe);
+                        total.image = self.items[idRecipe].image;
+                        total.name  = self.items[idRecipe].name;
+                        total.url   = self.items[idRecipe].url;
                     }
 
-                    html.push('</li>');
-                }
-
-            html.push('</ul></td>');
-            html.push('</tr>');
-
-            html.push('</table>');
+                totals.push(total);
+            }
         }
 
-        self.postMessage({type: 'updateBuildingsList', html: html.join('')});
+        self.postMessage({type: 'updateBuildingsList', locale: self.locale, buildings: buildings, totals: totals});
+    };
+
+    self.generateGraphNetwork = function()
+    {
+        // Named for what the page does with it, not for what happens here: the
+        // nodes and edges go over as they are and cytoscape lays them out.
         self.postMessage({type: 'updateLoaderText', text: 'Generating buildings layout...'});
         self.postMessage({type: 'updateGraphNetwork', nodes: self.graphNodes, edges: self.graphEdges, direction: self.graphDirection});
-        self.postMessage({type: 'done'});
     };
 
 

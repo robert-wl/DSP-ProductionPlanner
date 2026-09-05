@@ -2,8 +2,13 @@
 
 /**
  * The safety net for the calculation optimization: for every scenario, the
- * current worker must post exactly what the pre-optimization reference worker
- * posts. Node ids, edge quantities, generated HTML, required power - all of it.
+ * current worker must produce exactly what the pre-optimization reference
+ * worker posts. Node ids, edge quantities, required power - all of it.
+ *
+ * The reference posts the three list panes as HTML; the current worker posts
+ * the data and lib/resultHtml.mjs builds the markup, which runWorker.js runs
+ * before comparing. So this pins the renderer too: the markup has to come out
+ * byte for byte the same as the strings the worker used to concatenate.
  */
 
 const test   = require('node:test');

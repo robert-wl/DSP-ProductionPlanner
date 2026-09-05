@@ -8,13 +8,26 @@ These tests exist to keep it that way.
 `test/fixtures/referenceWorker.js` is a verbatim copy of `src/Worker.js` as it
 stood at commit `6afbc50`, before the optimization. `test/differential.test.js`
 runs it and the current `src/Worker.js` side by side over the same scenarios
-and requires them to post byte-identical results — node ids, edge quantities,
-generated HTML, required power, everything.
+and requires byte-identical results — node ids, edge quantities, required
+power, everything.
+
+The reference worker posts the three list panes as HTML strings it concatenates
+itself. The current one posts the data behind them and `lib/resultHtml.mjs`
+turns that into markup, so `runWorker.js` renders before comparing. The
+differential therefore pins the renderer as well: the HTML it produces has to
+match the reference's byte for byte.
 
 `test/runWorker.js` loads either worker into a `vm` context whose `self` is the
 context global, which is what a real WebWorker scope gives it. The worker keeps
 all of its state on `self`, and `generateTreeList` reads `requestedItems` as a
 bare global, so that detail matters.
+
+`test/panes.test.js` covers the part the differential cannot: it always asks
+for every result, so it never exercises a run that builds one. These check that
+a result built on demand is identical to the one a full run posts, that a run
+builds nothing it was not asked for, and that the graph carries a merger and
+splitter tag only when the production tree ran first — a real dependency
+between two of the panes, pinned rather than left to be discovered.
 
 `test/units.test.js` covers the individual lookups and helpers that were
 replaced, including the ones whose contract is easy to get subtly wrong:
@@ -24,7 +37,7 @@ exactly the value the original decrement loop reached.
 ## Running them
 
 ```
-npm test              # differential + unit tests
+npm test              # differential + pane + unit tests
 npm run benchmark     # times the current worker against the reference
 ```
 
