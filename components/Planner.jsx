@@ -7,7 +7,9 @@ import {
     ASSEMBLER_SPEEDS,
     DEFAULT_STATE,
     DIRECTIONS,
+    SMELTER_SPEEDS,
     buildFormData,
+    recipesForState,
     shareUrlFor,
     stateFromPayload
 } from '../lib/plannerState.js';
@@ -109,7 +111,9 @@ export default function Planner({initialPayload})
             language    : currentGameData.language || 'en',
             buildings   : currentGameData.buildingsData,
             items       : currentGameData.itemsData,
-            recipes     : currentGameData.recipesData,
+            // Narrowed to the machine tiers this run uses, for the groups the
+            // worker has no option for.
+            recipes     : recipesForState(currentState, currentGameData.recipesData),
             formData    : buildFormData(currentState),
 
             onError     : function(message){
@@ -131,7 +135,7 @@ export default function Planner({initialPayload})
                     case 'updateUrl':
                         if(pushUrl === true)
                         {
-                            window.history.pushState({}, '', shareUrlFor(message.url));
+                            window.history.pushState({}, '', shareUrlFor(message.url, currentState));
                         }
                         break;
 
@@ -507,6 +511,15 @@ export default function Planner({initialPayload})
                             <span>Max assembler</span>
                             <select value={state.maxAssemblerSpeed} onChange={function(event){ updateOption('maxAssemblerSpeed', event.target.value); }}>
                                 {ASSEMBLER_SPEEDS.map(function(speed){
+                                    return <option key={speed.value} value={speed.value}>{speed.label}</option>;
+                                })}
+                            </select>
+                        </label>
+
+                        <label className="field">
+                            <span>Smelter</span>
+                            <select value={state.maxSmelterSpeed} onChange={function(event){ updateOption('maxSmelterSpeed', event.target.value); }}>
+                                {SMELTER_SPEEDS.map(function(speed){
                                     return <option key={speed.value} value={speed.value}>{speed.label}</option>;
                                 })}
                             </select>

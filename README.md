@@ -68,6 +68,13 @@ all reversible there:
   *last* producer listed, so a Re-composing Assembler or a Quantum Chemical Plant
   would silently become the default with no UI to choose otherwise. They are
   still in the table as buildable items.
+
+  The worker only has one machine-tier option of its own, `maxAssemblerSpeed`,
+  which names the three assembler keys outright. Anything else is chosen for the
+  page by `recipesForState` in `lib/plannerState.js`, which narrows `mProducedIn`
+  to the tier the run is using before the table is handed over - that is what the
+  smelter select does, and adding another group is one entry in
+  `CLIENT_MACHINE_TIERS`.
 - **Orbital collector recipes are dropped.** They are map-capped pseudo-recipes,
   not something you build.
 - **Deuterium fractionation keeps its 100:1 ratio.** Upstream states it as
