@@ -3,7 +3,7 @@ import {sampleGameData} from '../../../lib/sampleGameData.js';
 /**
  * Serves the buildings / items / recipes tables the planner runs on.
  *
- * src/DSPCPP.js fetched these straight from the upstream site, which only
+ * The upstream page fetched these straight from its own site, which only
  * works from a page served by that same origin. Going through a route handler
  * instead keeps the browser same-origin, lets the response be cached, and
  * makes the upstream configurable per deployment.
@@ -33,10 +33,10 @@ function isUsable(data)
 }
 
 /**
- * The one normalization src/DSPCPP.js applied before handing the tables to the
- * worker. The worker only reads a recipe's className to sort "_Alternative"
+ * The one normalization the upstream page applied before handing the tables to
+ * the worker. The worker only reads a recipe's className to sort "_Alternative"
  * recipes last, so this is cosmetic - but it is kept so a payload rendered
- * here matches one rendered by the upstream page.
+ * here matches one rendered by the original planner.
  */
 function normalize(data)
 {

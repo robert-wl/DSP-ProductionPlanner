@@ -21,8 +21,8 @@ const TABS = [
     {id: 'buildings',   label: 'Buildings'}
 ];
 
-// Matches the debounce src/DSPCPP.js used, so holding an arrow key on a
-// quantity does not start a worker per keystroke.
+// Matches the debounce the upstream page used, so holding an arrow key on
+// a quantity does not start a worker per keystroke.
 const RECALCULATE_DELAY = 500;
 
 export default function Planner({initialPayload})

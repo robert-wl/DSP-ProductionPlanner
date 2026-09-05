@@ -5,9 +5,9 @@ import {useEffect, useRef} from 'react';
 /**
  * The factory layout, drawn with cytoscape and laid out by ELK.
  *
- * The stylesheet and the layout options are the ones src/DSPCPP.js used, so
- * the graph looks the same as the upstream planner's. cytoscape and elkjs both
- * want a DOM, so they are pulled in only once the container is mounted.
+ * The stylesheet and the layout options are the ones the upstream page used,
+ * so the graph looks the same as the original planner's. cytoscape and elkjs
+ * both want a DOM, so they are pulled in only once the container is mounted.
  */
 export default function ProductionGraph({nodes, edges, direction, onLayoutDone})
 {

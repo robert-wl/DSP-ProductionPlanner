@@ -8,12 +8,12 @@ A game from Youthcat Studio.
 
 [![DSPCPP](./img/readmeImage.jpg)](https://dyson-calculator.com/en/production-planner)
 
-This repository ships the planner as a self-contained [Next.js](https://nextjs.org)
-app that deploys to Vercel as-is. Upstream, this repo was only the calculation
-bundle: `webpack` built `src/DSPCPP.js` into a single script that
-dyson-calculator.com loaded into a page it rendered itself, so there was nothing
-here to deploy — no HTML, no entry point, and the jQuery/Bootstrap markup the
-script drove lived in that site. The app in `app/` supplies that missing half.
+This repository is the planner as a standalone [Next.js](https://nextjs.org) app
+that deploys to Vercel as-is. Upstream it was only the calculation bundle:
+`webpack` built a single script that dyson-calculator.com loaded into a page it
+rendered itself, so there was nothing here to deploy — no HTML, no entry point,
+and the markup that script drove lived in that site. The app in `app/` supplies
+that missing half, and the embed bundle is gone: this repo builds one thing.
 
 ## Deploying to Vercel
 
@@ -61,17 +61,12 @@ npm start            # serve the production build
 | `src/Worker.js` | The planner itself, untouched. It is one self-contained function so it can be stringified into a Blob and run as a real WebWorker. |
 | `lib/plannerWorker.js` | Starts that worker and relays its messages. |
 | `lib/plannerState.js` | The planner's inputs, and their two shapes: the `formData` the worker expects, and the `/json/<payload>` share URL. |
-| `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's PHP templates. |
-| `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet `src/DSPCPP.js` used. |
+| `components/Planner.jsx` | The page: item pickers, options, tabs, loader — the half that used to live in the upstream site's templates. |
+| `components/ProductionGraph.jsx` | The factory layout, cytoscape + ELK, with the stylesheet the upstream page used. |
 | `app/api/game/route.js` | Game-data proxy, with the sample-data fallback. |
-| `src/DSPCPP.js`, `webpack.config.js` | The legacy embed bundle, kept so `npm run build-SCIM` still produces the script dyson-calculator.com loads. Not used by the Next.js app. |
 
 Share URLs keep the upstream `/json/<url-encoded JSON>` shape, so links made by
 the original planner open here unchanged.
-
-The Sentry webpack plugin was dropped from the legacy build: it only uploaded
-source maps to the upstream project's own Sentry organisation, and its install
-step made `npm install` fail for everyone else.
 
 ## Tests
 
