@@ -22,6 +22,13 @@ context global, which is what a real WebWorker scope gives it. The worker keeps
 all of its state on `self`, and `generateTreeList` reads `requestedItems` as a
 bare global, so that detail matters.
 
+`test/panes.test.js` covers the part the differential cannot: it always asks
+for every result, so it never exercises a run that builds one. These check that
+a result built on demand is identical to the one a full run posts, that a run
+builds nothing it was not asked for, and that the graph carries a merger and
+splitter tag only when the production tree ran first — a real dependency
+between two of the panes, pinned rather than left to be discovered.
+
 `test/units.test.js` covers the individual lookups and helpers that were
 replaced, including the ones whose contract is easy to get subtly wrong:
 "first match wins" in the class-name index, and the belt-speed clamp landing on
@@ -30,7 +37,7 @@ exactly the value the original decrement loop reached.
 ## Running them
 
 ```
-npm test              # differential + unit tests
+npm test              # differential + pane + unit tests
 npm run benchmark     # times the current worker against the reference
 ```
 

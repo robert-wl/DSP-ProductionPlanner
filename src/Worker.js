@@ -2,6 +2,10 @@
 
 export default function ProductionPlannerWorker()
 {
+    // In the order the page's tabs are in, which is the order the results were
+    // posted in back when every run built all four.
+    const ALL_PANES = ['tree', 'items', 'buildings', 'graph'];
+
     self.url            = {};
 
     self.debug          = false;
@@ -28,6 +32,8 @@ export default function ProductionPlannerWorker()
     self.requiredPower  = 0;
     self.listItems      = {};
     self.listBuildings  = {};
+
+    self.panes          = ALL_PANES;
 
     self.nodeIdKey      = 0;
     self.graphNodes     = [];
@@ -58,6 +64,17 @@ export default function ProductionPlannerWorker()
     self.numberFormat                   = null;
 
     self.onmessage = function(e) {
+        // A pane the page has since opened. The calculation is still here, so
+        // this only builds the one result that was asked for.
+        if(e.data.type === 'requestPanes')
+        {
+            self.postMessage({type: 'showLoader'});
+            self.generatePanes(e.data.panes);
+            self.postMessage({type: 'done'});
+
+            return;
+        }
+
         self.postMessage({type: 'showLoader'});
 
         // Add default
@@ -69,7 +86,35 @@ export default function ProductionPlannerWorker()
         self.items          = Object.assign({}, e.data.items, e.data.buildings);
         self.recipes        = e.data.recipes;
 
+        // Which results to build once the calculation is done. Everything,
+        // unless the page says otherwise - the differential test suite drives
+        // this worker without one and expects the full set.
+        self.panes          = (e.data.panes === undefined) ? ALL_PANES : e.data.panes;
+
         self.prepareOptions(e.data.formData);
+    };
+
+    self.generatePanes = function(panes)
+    {
+        for(let i = 0; i < panes.length; i++)
+        {
+            if(panes[i] === 'tree')
+            {
+                self.generateTreeList();
+            }
+            else if(panes[i] === 'items')
+            {
+                self.generateItemsList();
+            }
+            else if(panes[i] === 'buildings')
+            {
+                self.generateBuildingList();
+            }
+            else if(panes[i] === 'graph')
+            {
+                self.generateGraphNetwork();
+            }
+        }
     };
 
     // Intl.NumberFormat construction is expensive, and the lists below format
@@ -1005,7 +1050,9 @@ export default function ProductionPlannerWorker()
 
         self.postMessage({type: 'updateRequiredPower', power: self.requiredPower});
 
-        self.generateTreeList();
+        self.generatePanes(self.panes);
+
+        self.postMessage({type: 'done'});
     };
 
     self.startMainNode = function(itemKey, mainRequiredQty) {
@@ -1531,7 +1578,6 @@ export default function ProductionPlannerWorker()
             branches: self.hierarchyBranches
         });
 
-        self.generateItemsList();
     };
 
     /**
@@ -1582,6 +1628,11 @@ export default function ProductionPlannerWorker()
                     }
                     else
                     {
+                        // Upstream tagged the node itself rather than resolving
+                        // the building locally. Kept, because the tagged nodes
+                        // go out with the graph - so this is the one thing the
+                        // panes are not independent about, and the graph pane
+                        // must not come to depend on it.
                         if(childNode.data.nodeType === 'merger')
                         {
                             childNode.data.buildingType = 'ConveyorBeltMk1';
@@ -1655,7 +1706,6 @@ export default function ProductionPlannerWorker()
         }
 
         self.postMessage({type: 'updateItemsList', locale: self.locale, items: items});
-        self.generateBuildingList();
     };
 
     self.generateBuildingList = function()
@@ -1732,9 +1782,14 @@ export default function ProductionPlannerWorker()
         }
 
         self.postMessage({type: 'updateBuildingsList', locale: self.locale, buildings: buildings, totals: totals});
+    };
+
+    self.generateGraphNetwork = function()
+    {
+        // Named for what the page does with it, not for what happens here: the
+        // nodes and edges go over as they are and cytoscape lays them out.
         self.postMessage({type: 'updateLoaderText', text: 'Generating buildings layout...'});
         self.postMessage({type: 'updateGraphNetwork', nodes: self.graphNodes, edges: self.graphEdges, direction: self.graphDirection});
-        self.postMessage({type: 'done'});
     };
 
 

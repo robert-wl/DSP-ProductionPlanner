@@ -70,7 +70,11 @@ function runScenario(workerSourcePath, scenario)
             items       : structuredClone(gameData.items),
             recipes     : structuredClone(gameData.recipes),
 
-            formData    : structuredClone(scenario.formData)
+            formData    : structuredClone(scenario.formData),
+
+            // Left undefined by every differential scenario, which is what
+            // makes the worker build all four results like it always did
+            panes       : scenario.panes
         }
     });
 

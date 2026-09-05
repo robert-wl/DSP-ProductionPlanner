@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import ItemPicker from './ItemPicker.jsx';
 import ProductionGraph from './ProductionGraph.jsx';
-import {startPlannerWorker} from '../lib/plannerWorker.js';
+import {requestPanes, startPlannerWorker} from '../lib/plannerWorker.js';
 import {renderBuildingsList, renderItemsList, renderTreeList} from '../lib/resultHtml.mjs';
 import {
     ASSEMBLER_SPEEDS,
@@ -59,6 +59,14 @@ export default function Planner({initialPayload})
     let isFirstRunRef   = useRef(true);
     let treeRef         = useRef(null);
 
+    // Which of the four results the current worker has been asked for, and
+    // which tab wants one. A run only builds the tab you are looking at; the
+    // rest are asked for when you open them.
+    let requestedRef    = useRef(new Set());
+    let awaitingGraph   = useRef(false);
+    let tabRef          = useRef(tab);
+        tabRef.current  = tab;
+
     // Game data -------------------------------------------------------------
     useEffect(function(){
         let cancelled = false;
@@ -110,6 +118,14 @@ export default function Planner({initialPayload})
         setTreeData(null);
         setItemsData(null);
         setBuildings(null);
+        // Left up, the old layout would read as this plan's until the graph
+        // pane is asked for again, which may be never.
+        setGraph({nodes: null, edges: [], direction: currentState.direction});
+
+        let firstPane = tabRef.current;
+
+        requestedRef.current    = new Set([firstPane]);
+        awaitingGraph.current   = (firstPane === 'graph');
 
         workerRef.current = startPlannerWorker({
             language    : currentGameData.language || 'en',
@@ -119,9 +135,11 @@ export default function Planner({initialPayload})
             // worker has no option for.
             recipes     : recipesForState(currentState, currentGameData.recipesData),
             formData    : buildFormData(currentState),
+            panes       : [firstPane],
 
             onError     : function(message){
                 setWorkerError(message);
+                awaitingGraph.current = false;
                 setBusy(false);
             },
 
@@ -164,6 +182,21 @@ export default function Planner({initialPayload})
                         break;
 
                     case 'done':
+                        // A tab opened while the worker was busy could not be
+                        // asked for then; its turn is now.
+                        if(requestedRef.current.has(tabRef.current) === false && workerRef.current !== null)
+                        {
+                            requestedRef.current.add(tabRef.current);
+                            awaitingGraph.current = awaitingGraph.current || tabRef.current === 'graph';
+
+                            requestPanes(workerRef.current, [tabRef.current]);
+                            break;
+                        }
+
+                        if(awaitingGraph.current === false)
+                        {
+                            setBusy(false);
+                        }
                         break;
 
                     default:
@@ -204,6 +237,26 @@ export default function Planner({initialPayload})
             }
         };
     }, []);
+
+    // Opening a tab this run has not built yet. The worker still has the graph
+    // it worked out, so this is the one result, not the whole calculation.
+    // While it is still busy the request would sit behind the run anyway, so
+    // the 'done' handler picks it up instead.
+    useEffect(function(){
+        if(workerRef.current === null || busy === true || requestedRef.current.has(tab) === true)
+        {
+            return;
+        }
+
+        requestedRef.current.add(tab);
+
+        if(tab === 'graph')
+        {
+            awaitingGraph.current = true;
+        }
+
+        requestPanes(workerRef.current, [tab]);
+    }, [tab, busy]);
 
     // The markup for the three list panes. The worker posts the data and this
     // is where it becomes HTML.
@@ -665,7 +718,10 @@ export default function Planner({initialPayload})
                                 nodes={graph.nodes}
                                 edges={graph.edges}
                                 direction={graph.direction}
-                                onLayoutDone={function(){ setBusy(false); }}
+                                onLayoutDone={function(){
+                                    awaitingGraph.current = false;
+                                    setBusy(false);
+                                }}
                             />
                         </div>
 
